@@ -19,7 +19,6 @@ endif()
 
 # Link to the actual SDL2 library. SDL2::SDL2 is the shared SDL library, SDL2::SDL2-static is the static SDL libarary.
 target_link_libraries(cases_briques PRIVATE SDL2::SDL2)
-include_directories(code/vendor/sdl2/include)
 
 # https://stackoverflow.com/a/61708554/13577241
 if (WIN32)
