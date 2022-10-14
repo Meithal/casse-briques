@@ -87,13 +87,24 @@ void writeFreetype(char* text, FT_Face face, int x, int y, SDL_Window * sdlWindo
         colors[i].r = colors[i].g = colors[i].b = i;
     }
 
+//    SDL_RGB()
+
     for (int i = 0; text[i]; i++) {
         ftError = FT_Load_Char(face, text[i], FT_LOAD_RENDER);
 
         if(ftError) {
-            printf("Error setting the size %s", FT_Error_String(ftError));
+            printf("Error loading char %s", FT_Error_String(ftError));
+
             continue; // ignore errors
         }
+
+        ftError = FT_Render_Glyph( face->glyph, FT_RENDER_MODE_NORMAL );
+        if ( ftError ) {
+            printf("Error rendering glyph %s", FT_Error_String(ftError));
+
+            continue;
+        }
+
 
         SDL_Surface * glyph = SDL_CreateRGBSurfaceFrom(
                 slot->bitmap.buffer,
@@ -112,10 +123,10 @@ void writeFreetype(char* text, FT_Face face, int x, int y, SDL_Window * sdlWindo
                 );
         SDL_FreeSurface(glyph);
 
-        pen.x = slot->advance.x;
-        pen.y = slot->advance.y;
-    }
+        pen.x += slot->advance.x >> 6;
+        pen.y += slot->advance.y >> 6;
 
+    }
     SDL_RenderPresent(SDL_GetRenderer(sdlWindow));
     SDL_UpdateWindowSurface(sdlWindow);
 }
