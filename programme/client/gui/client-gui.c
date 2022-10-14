@@ -4,12 +4,14 @@
 
 #include "stdio.h"
 
-#include <SDL.h>
+#include "SDL.h"
 
 
 int main(int argc, char** argv) {
 
+    // https://zestedesavoir.com/tutoriels/1014/utiliser-la-sdl-en-langage-c/dessiner-dans-la-fenetre/
     int init = SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Color orange = {255, 127, 40, 255};
 
     if(init < 0) {
         printf("error init %s \n", SDL_GetError());
@@ -35,11 +37,24 @@ int main(int argc, char** argv) {
     }
 
     SDL_Renderer * sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
-    if(NULL == window2)
+    if(NULL == sdlRenderer)
     {
         fprintf(stderr, "Erreur SDL_CreateRenderer : %s", SDL_GetError());
         goto QuitWindow2;
     }
+
+    if(0!= SDL_SetRenderDrawColor(sdlRenderer, orange.r, orange.g, orange.b, orange.a)) {
+        goto QuitRenderer;
+    }
+
+    if(0 != SDL_RenderClear(sdlRenderer))
+    {
+        fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+        goto QuitRenderer;
+    }
+
+    SDL_Delay(500);
+    SDL_RenderPresent(sdlRenderer);
     SDL_Delay(3000);
 
     QuitRenderer:SDL_DestroyRenderer(sdlRenderer);

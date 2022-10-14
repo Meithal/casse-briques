@@ -1,16 +1,20 @@
 cmake_minimum_required(VERSION 3.23)
-project(cases_briques C)
+project(cases_briques
+        VERSION 0.0.1
+        DESCRIPTION "projet esgi 3e annee moc"
+        HOMEPAGE_URL "https://gitlab.com/projets-esgi1/casses-briques-esgi/programme"
+        LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 
-include_directories(code)
+include_directories(programme)
 
-execute_process(COMMAND python download-deps.py WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/code")
+execute_process(COMMAND python download-deps.py WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/programme")
 
 add_executable(cases_briques
-        code/client-gui.c)
+        programme/client/gui/client-gui.c)
 
-add_subdirectory(code/vendor/sdl2 EXCLUDE_FROM_ALL)
+add_subdirectory(programme/vendor/sdl2 EXCLUDE_FROM_ALL)
 
 if(TARGET SDL2::SDL2main)
     # It has an implicit dependency on SDL2 functions, so it MUST be added before SDL2::SDL2 (or SDL2::SDL2-static)
