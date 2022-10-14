@@ -1,0 +1,16 @@
+bombs=1
+columns=15
+rows=13
+xxxxxxxxxxxxxxx
+xp mmmmmmmmm px
+x xmxmxmxmxmx x
+xmmmmmmmmmmmmmx
+xmxmxmxmxmxmxmx
+xmmmmmmmmmmmmmx
+xmxmxmxmxmxmxmx
+xmmmmmmmmmmmmmx
+xmxmxmxmxmxmxmx
+xmmmmmmmmmmmmmx
+x xmxmxmxmxmx x
+xp mmmmmmmmm px
+xxxxxxxxxxxxxxx

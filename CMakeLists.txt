@@ -7,12 +7,18 @@ project(cases_briques
 
 set(CMAKE_C_STANDARD 11)
 
-include_directories(programme)
-
-execute_process(COMMAND python download-deps.py WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/programme")
-
 add_executable(cases_briques
         programme/client/gui/client-gui.c)
+target_include_directories(cases_briques PRIVATE programme)
+
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/assets"
+        "${PROJECT_BINARY_DIR}/assets"
+        VERBATIM)
+
+execute_process(COMMAND python download-deps.py WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/programme")
 
 add_subdirectory(programme/vendor/sdl2 EXCLUDE_FROM_ALL)
 
@@ -34,3 +40,12 @@ if (WIN32)
             $<TARGET_FILE_DIR:${PROJECT_NAME}>
             VERBATIM)
 endif()
+
+set(FT_DISABLE_ZLIB TRUE)
+set(FT_DISABLE_BZIP2 TRUE)
+set(FT_DISABLE_PNG TRUE)
+set(FT_DISABLE_HARFBUZZ TRUE)
+set(FT_DISABLE_BROTLI TRUE)
+add_subdirectory(programme/vendor/freetype)
+
+target_link_libraries(cases_briques PRIVATE freetype)
