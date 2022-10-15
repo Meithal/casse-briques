@@ -4,6 +4,8 @@
 
 #include "stdio.h"
 
+#include "conio.h"
+
 #include "SDL.h"
 #include "freetype/freetype.h"
 
@@ -16,7 +18,7 @@ typedef struct freetype_wrapper {
 } t_ftw;
 
 
-int loadFreetype(t_ftw * ftw, float hdpi, float vdpi) {
+int loadFreetype(t_ftw * ftw, float hdpi, float vdpi, int char_width) {
     FT_Library ftLibrary;
     FT_Face ftFace;
 
@@ -41,7 +43,7 @@ int loadFreetype(t_ftw * ftw, float hdpi, float vdpi) {
             );
 
     ftError = FT_Set_Char_Size(
-            ftFace, 50*64, 0,
+            ftFace, char_width*64, 0,
             (FT_UInt)hdpi, (FT_UInt)vdpi
             );
 
@@ -173,7 +175,7 @@ int main(int argc, char** argv) {
     SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi);
     printf("DPI ecran ddpi %f, hdpi %f, vdpi %f\n", ddpi, hdpi, vdpi);
 
-    if(0!=loadFreetype(&freetypeWrapper, hdpi, vdpi)) {
+    if(0!=loadFreetype(&freetypeWrapper, hdpi, vdpi, 140)) {
         goto QuitRenderer;
     }
 
