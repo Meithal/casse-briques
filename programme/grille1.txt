@@ -1,7 +1,0 @@
-column=9
-row=5
-xxxxxxxxx
-xp mmmmmx
-x xmxmx x
-xmmmmm px
-xxxxxxxxx

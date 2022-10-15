@@ -4,13 +4,10 @@
 
 #include "stdio.h"
 #include "string.h"
-typedef struct field field;
-struct field {
-    int visual;
-    char txt;
-    int destructible;
-};
-void main () {
+
+#include "common/structures.h"
+
+int main () {
     field vide = {
             .visual = 32,
             .txt = ' ',
@@ -27,7 +24,7 @@ void main () {
             .destructible = 0,
     };
 
-    FILE *f = fopen("grille1.txt","r");
+    FILE *f = fopen("assets/maps/grille1.txt","r");
     if (f == NULL) {
         printf("file empty");
     } else {

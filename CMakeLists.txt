@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(cases_briques
+project(casses_briques
         VERSION 0.0.1
         DESCRIPTION "projet esgi 3e annee moc"
         HOMEPAGE_URL "https://gitlab.com/projets-esgi1/casses-briques-esgi/programme"
@@ -7,12 +7,17 @@ project(cases_briques
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(cases_briques
+add_executable(casses_briques-gui
         programme/client/gui/client-gui.c)
-target_include_directories(cases_briques PRIVATE programme)
+target_include_directories(casses_briques-gui PRIVATE programme)
+
+add_executable(casses_briques-cli
+        programme/client/cli/grille.c)
+target_include_directories(casses_briques-cli PRIVATE programme)
+
 
 add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
+        TARGET ${PROJECT_NAME}-gui POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/assets"
         "${PROJECT_BINARY_DIR}/assets"
@@ -24,20 +29,20 @@ add_subdirectory(programme/vendor/sdl2 EXCLUDE_FROM_ALL)
 
 if(TARGET SDL2::SDL2main)
     # It has an implicit dependency on SDL2 functions, so it MUST be added before SDL2::SDL2 (or SDL2::SDL2-static)
-    target_link_libraries(cases_briques PRIVATE SDL2::SDL2main)
+    target_link_libraries(casses_briques-gui PRIVATE SDL2::SDL2main)
 endif()
 
 # Link to the actual SDL2 library. SDL2::SDL2 is the shared SDL library, SDL2::SDL2-static is the static SDL libarary.
-target_link_libraries(cases_briques PRIVATE SDL2::SDL2)
+target_link_libraries(casses_briques-gui PRIVATE SDL2::SDL2)
 
 # https://stackoverflow.com/a/61708554/13577241
 if (WIN32)
     # copy the .dll file to the same folder as the executable
     add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
+            TARGET ${PROJECT_NAME}-gui POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:SDL2::SDL2>
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}-gui>
             VERBATIM)
 endif()
 
@@ -48,4 +53,4 @@ set(FT_DISABLE_HARFBUZZ TRUE)
 set(FT_DISABLE_BROTLI TRUE)
 add_subdirectory(programme/vendor/freetype)
 
-target_link_libraries(cases_briques PRIVATE freetype)
+target_link_libraries(casses_briques-gui PRIVATE freetype)
