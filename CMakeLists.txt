@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.10)
 project(casses_briques
         VERSION 0.0.1
         DESCRIPTION "projet esgi 3e annee moc"
@@ -46,11 +46,11 @@ if (WIN32)
             VERBATIM)
 endif()
 
-set(FT_DISABLE_ZLIB TRUE)
-set(FT_DISABLE_BZIP2 TRUE)
-set(FT_DISABLE_PNG TRUE)
-set(FT_DISABLE_HARFBUZZ TRUE)
-set(FT_DISABLE_BROTLI TRUE)
+set(FT_DISABLE_ZLIB CACHE BOOL TRUE)
+set(FT_DISABLE_BZIP2 CACHE BOOL TRUE)
+set(FT_DISABLE_PNG CACHE BOOL TRUE)
+set(FT_DISABLE_HARFBUZZ CACHE BOOL TRUE)
+set(FT_DISABLE_BROTLI CACHE BOOL TRUE)
 add_subdirectory(programme/vendor/freetype)
 
 target_link_libraries(casses_briques-gui PRIVATE freetype)
