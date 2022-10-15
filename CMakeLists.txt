@@ -8,7 +8,7 @@ project(casses_briques
 set(CMAKE_C_STANDARD 11)
 
 add_executable(casses_briques-gui
-        programme/client/gui/client-gui.c)
+        programme/client/gui/client-gui.c programme/client/gui/freetype-functions.c programme/client/gui/freetype-functions.h programme/client/gui/sdl-functions.c programme/client/gui/sdl-functions.h)
 target_include_directories(casses_briques-gui PRIVATE programme)
 
 add_executable(casses_briques-cli
@@ -46,11 +46,11 @@ if (WIN32)
             VERBATIM)
 endif()
 
-set(FT_DISABLE_ZLIB CACHE BOOL TRUE)
-set(FT_DISABLE_BZIP2 CACHE BOOL TRUE)
-set(FT_DISABLE_PNG CACHE BOOL TRUE)
-set(FT_DISABLE_HARFBUZZ CACHE BOOL TRUE)
-set(FT_DISABLE_BROTLI CACHE BOOL TRUE)
+set(FT_DISABLE_ZLIB TRUE)
+set(FT_DISABLE_BZIP2 TRUE)
+set(FT_DISABLE_PNG TRUE)
+set(FT_DISABLE_HARFBUZZ TRUE)
+set(FT_DISABLE_BROTLI TRUE)
 add_subdirectory(programme/vendor/freetype)
 
 target_link_libraries(casses_briques-gui PRIVATE freetype)

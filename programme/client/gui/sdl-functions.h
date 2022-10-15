@@ -1,0 +1,10 @@
+//
+// Created by hurin on 15/10/2022.
+//
+
+#ifndef CASSES_BRIQUES_SDL_FUNCTIONS_H
+#define CASSES_BRIQUES_SDL_FUNCTIONS_H
+
+
+
+#endif //CASSES_BRIQUES_SDL_FUNCTIONS_H
