@@ -85,6 +85,8 @@ int main(int argc, char** argv) {
     SDL_RenderFillRect(sdlRenderer, &rect);
     SDL_RenderPresent(sdlRenderer);
 
+    SDL_Delay(500);
+
     writeFreetype("casses briques", freetypeWrapper.ftFaces[0], 50, 50, sdlWindow);
 
     SDL_bool continuer = SDL_TRUE;

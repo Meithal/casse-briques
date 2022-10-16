@@ -8,11 +8,17 @@ project(casses_briques
 set(CMAKE_C_STANDARD 11)
 
 add_executable(casses_briques-gui
-        programme/client/gui/client-gui.c programme/client/gui/freetype-functions.c programme/client/gui/freetype-functions.h programme/client/gui/sdl-functions.c programme/client/gui/sdl-functions.h)
+        programme/client/gui/client-gui.c
+        programme/client/gui/freetype-functions.c
+        programme/client/gui/freetype-functions.h
+        programme/client/gui/sdl-functions.c
+        programme/client/gui/sdl-functions.h)
 target_include_directories(casses_briques-gui PRIVATE programme)
 
 add_executable(casses_briques-cli
-        programme/client/cli/grille.c)
+        programme/client/cli/grille.c
+        programme/client/cli/windows_compatibility/winterm.c
+        programme/client/cli/windows_compatibility/winterm.h)
 target_include_directories(casses_briques-cli PRIVATE programme)
 
 

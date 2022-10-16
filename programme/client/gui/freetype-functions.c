@@ -115,6 +115,7 @@ void writeFreetype(char* text, FT_Face face, int x, int y, SDL_Window * sdlWindo
         pen.y += slot->advance.y >> 6;
 
     }
+
     SDL_RenderPresent(SDL_GetRenderer(sdlWindow));
     SDL_UpdateWindowSurface(sdlWindow);
 }

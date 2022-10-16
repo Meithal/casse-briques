@@ -6,6 +6,9 @@
 #include "string.h"
 
 #include "common/structures.h"
+#ifdef _WIN32
+#include "client/cli/windows_compatibility/winterm.h"
+#endif
 
 int main () {
     field vide = {
@@ -23,6 +26,13 @@ int main () {
             .txt = 'x',
             .destructible = 0,
     };
+#ifdef _WIN32
+    EnableVTMode();
+#endif
+    puts("Bienvenue dans le casse briques.");
+    puts("Appuyez sur une touche pour continuer.");
+    getchar();
+    puts("\033[2J\033[H");
 
     FILE *f = fopen("assets/maps/grille1.txt","r");
     if (f == NULL) {
