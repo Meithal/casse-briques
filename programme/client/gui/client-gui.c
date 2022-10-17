@@ -8,6 +8,7 @@
 #include "SDL.h"
 
 #include "common/structures.h"
+#include "common/network/winsock/winsock.h"
 #include "freetype-functions.h"
 
 //SDL_Window * createSDL
@@ -89,6 +90,8 @@ int main(int argc, char** argv) {
 
     writeFreetype("casses briques", freetypeWrapper.ftFaces[0], 50, 50, sdlWindow);
 
+    StartWinsock();
+
     SDL_bool continuer = SDL_TRUE;
 
     SDL_Event event;
@@ -123,6 +126,8 @@ int main(int argc, char** argv) {
         SDL_DestroyWindow(sdlWindow);
     }
     SDL_Quit();
+
+    StopWinsock();
 
     return 0;
 }

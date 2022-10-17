@@ -12,14 +12,37 @@ add_executable(casses_briques-gui
         programme/client/gui/freetype-functions.c
         programme/client/gui/freetype-functions.h
         programme/client/gui/sdl-functions.c
-        programme/client/gui/sdl-functions.h)
+        programme/client/gui/sdl-functions.h
+        )
 target_include_directories(casses_briques-gui PRIVATE programme)
 
 add_executable(casses_briques-cli
         programme/client/cli/grille.c
         programme/client/cli/windows_compatibility/winterm.c
-        programme/client/cli/windows_compatibility/winterm.h)
+        programme/client/cli/windows_compatibility/winterm.h
+        )
 target_include_directories(casses_briques-cli PRIVATE programme)
+
+add_executable(casses_briques-server
+        programme/server/server.h
+        programme/server/server.c
+        )
+target_include_directories(casses_briques-server PRIVATE programme)
+
+if(WIN32)
+    target_link_libraries(casses_briques-gui PRIVATE wsock32 ws2_32)
+    target_link_libraries(casses_briques-cli PRIVATE wsock32 ws2_32)
+    target_link_libraries(casses_briques-server PRIVATE wsock32 ws2_32)
+    target_sources(casses_briques-gui PRIVATE
+            programme/common/network/winsock/winsock.c
+            programme/common/network/winsock/winsock.h)
+    target_sources(casses_briques-cli PRIVATE
+            programme/common/network/winsock/winsock.c
+            programme/common/network/winsock/winsock.h)
+    target_sources(casses_briques-server PRIVATE
+            programme/common/network/winsock/winsock.c
+            programme/common/network/winsock/winsock.h)
+endif()
 
 
 add_custom_command(
