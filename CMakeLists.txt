@@ -18,8 +18,6 @@ target_include_directories(casses_briques-gui PRIVATE programme)
 
 add_executable(casses_briques-cli
         programme/client/cli/grille.c
-        programme/client/cli/windows_compatibility/winterm.c
-        programme/client/cli/windows_compatibility/winterm.h
         )
 target_include_directories(casses_briques-cli PRIVATE programme)
 
@@ -38,11 +36,19 @@ if(WIN32)
             programme/common/network/winsock/winsock_utils.h)
     target_sources(casses_briques-cli PRIVATE
             programme/common/network/winsock/winsock_utils.c
-            programme/common/network/winsock/winsock_utils.h)
+            programme/common/network/winsock/winsock_utils.h
+            programme/client/cli/windows_compatibility/winterm.c
+            programme/client/cli/windows_compatibility/winterm.h
+            )
     target_sources(casses_briques-server PRIVATE
             programme/common/network/winsock/winsock_utils.c
-            programme/common/network/winsock/winsock_utils.h)
+            programme/common/network/winsock/winsock_utils.h
+            programme/client/cli/windows_compatibility/winterm.c
+            programme/client/cli/windows_compatibility/winterm.h
 
+            )
+
+    target_compile_definitions(casses_briques-server PRIVATE _UNICODE)
     target_compile_definitions(casses_briques-cli PRIVATE _UNICODE)
 endif()
 

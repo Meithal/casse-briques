@@ -9,10 +9,35 @@
 
 #include "common/network/winsock/winsock_utils.h"
 
+#ifdef _WIN32
+#include "client/cli/windows_compatibility/winterm.h"
+#endif
+
 #include "server.h"
 
 bool ConnectionClient(SOCKET sd);
-LPTHREAD_START_ROUTINE ThreadServeur(void* sd_);
+
+DWORD WINAPI ThreadServeur(LPVOID sd_) {
+    int nRetval = 0;
+    SOCKET sd = (SOCKET)sd_;
+
+    if (!ConnectionClient(sd)) {
+        printf("Erreur avec le client\n");
+        nRetval = 3;
+    }
+
+    puts("Fermeture connection avec client...");
+    if (ShutdownConnection(sd)) {
+        printf("Connection is down.");
+    }
+    else {
+        fprintf(stderr, "Connection shutdown failed\n");
+        nRetval = 3;
+    }
+
+    return nRetval;
+}
+
 
 int main()
 {
@@ -39,35 +64,19 @@ int main()
 //    }
     /* On devrait faire closesocket(sock); puis WSACleanup(); mais puisqu'on a entré une boucle infinie ... */
 
+#ifdef _WIN32
+    SetupConsoleForUnicode();
+#endif
+
     StartWinsock();
     SOCKET s;
-    StartServer(&s, ThreadServeur);
+    StartServer(&s, (LPTHREAD_START_ROUTINE) ThreadServeur);
     CloseServer(&s);
     StopWinsock();
 
     return 0;
 }
 
-LPTHREAD_START_ROUTINE ThreadServeur(void* sd_) {
-    int nRetval = 0;
-    SOCKET sd = (SOCKET)sd_;
-
-    if (!ConnectionClient(sd)) {
-        printf("Erreur avec le client\n");
-        nRetval = 3;
-    }
-
-    puts("Fermeture connection avec client...");
-    if (ShutdownConnection(sd)) {
-        printf("Connection is down.");
-    }
-    else {
-        fprintf(stderr, "Connection shutdown failed\n");
-        nRetval = 3;
-    }
-
-    return nRetval;
-}
 
 bool ConnectionClient(SOCKET sd) {
     // Read data from client
@@ -76,14 +85,14 @@ bool ConnectionClient(SOCKET sd) {
     do {
         nReadBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
         if (nReadBytes > 0) {
-            printf("Received %d bytes from client.\n", nReadBytes);
+            _tprintf(_T("Received %d bytes from client.\n"), nReadBytes);
 
             int nSentBytes = 0;
             while (nSentBytes < nReadBytes) {
                 int nTemp = send(sd, acReadBuffer + nSentBytes,
                                  nReadBytes - nSentBytes, 0);
                 if (nTemp > 0) {
-                    printf("Sent %d bytes back to client.\n", nTemp);
+                    _tprintf(_T("Sent %d bytes back to client.\n"), nTemp);
                     nSentBytes += nTemp;
                 }
                 else if (nTemp == SOCKET_ERROR) {
@@ -92,7 +101,7 @@ bool ConnectionClient(SOCKET sd) {
                 else {
                     // Client closed connection before we could reply to
                     // all the data it sent, so bomb out early.
-                    puts("Peer unexpectedly dropped connection!");
+                    _putts(_T("Peer unexpectedly dropped connection!"));
                     return true;
                 }
             }
@@ -102,6 +111,6 @@ bool ConnectionClient(SOCKET sd) {
         }
     } while (nReadBytes != 0);
 
-    puts("Connection closed by peer.");
+    _putts(_T("Connection closed by peer."));
     return true;
 }

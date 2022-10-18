@@ -5,18 +5,20 @@
 
 #include "winsock_utils.h"
 #include "stdio.h"
+#include "tchar.h"
+
 
 int StartWinsock()
 {
     WSADATA WSAData;
     if(WSAStartup(MAKEWORD(2,0), &WSAData) != 0)
     {
-        printf("Winsock fail to initialize error code %d", WSAGetLastError());
+        _tprintf(_T("Winsock fail to initialize error code %d"), WSAGetLastError());
         return 1;
     };
     /* ... */
 
-    puts("winsock demarre");
+    _putts(_T("winsock demarre"));
 
     return 0;
 
@@ -26,11 +28,11 @@ int StopWinsock()
 {
     if(WSACleanup() != 0)
     {
-        printf("Winsock fail to cleanup error code %d", WSAGetLastError());
+        _tprintf(_T("Winsock fail to cleanup error code %d"), WSAGetLastError());
         return 1;
     }
 
-    puts("winsock stop");
+    _putts(_T("winsock stop"));
 
     return 0;
 }
@@ -45,12 +47,12 @@ TCHAR * FriendlyErrorMessage(int errorCode, DWORD bufferLen, LPSTR buffer) {
             )) {
 
         static TCHAR error[256] = {0};
-        return TEXT("Fail to generate error message for code %d");
+        _stprintf(error, bufferLen, _T("Fail to generate error message for code %ld"), GetLastError());
 
         return error;
     }
 
-    return "";
+    return buffer;
 }
 
 void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
@@ -60,10 +62,10 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
     //Create a socket
     if((*s = socket(AF_INET , SOCK_STREAM , 0 )) == INVALID_SOCKET)
     {
-        printf("Could not create socket : %d" , WSAGetLastError());
+        _tprintf(_T("Could not create socket : %d") , WSAGetLastError());
     }
 
-    printf("Socket created.\n");
+    _tprintf(_T("Socket created.\n"));
 
 
     server.sin_family = AF_INET;
@@ -73,23 +75,24 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
     //Bind
     if( bind(*s ,(struct sockaddr *)&server , sizeof(server)) == SOCKET_ERROR)
     {
-        printf("Bind failed with error code : %d" , WSAGetLastError());
+        _tprintf(_T("Bind failed with error code : %d") , WSAGetLastError());
     }
 
-    puts("Bind done.");
+    _putts(_T("Bind done."));
 
-//    listen(*s, SOMAXCONN);
+    listen(*s, SOMAXCONN);
 
     while (1) {
         struct sockaddr_in sinRemote;
         int sinsize = sizeof(sinRemote);
+        TCHAR errBuffer[256];
         SOCKET sd;
         if((sd = accept(*s, (struct sockaddr*)&sinRemote, &sinsize)) ==INVALID_SOCKET) {
-            printf("Connection invalide %d\n", WSAGetLastError());
+            _tprintf(_T("Connéction invalide %s\n"), FriendlyErrorMessage(WSAGetLastError(), 256, errBuffer));
             return;
         }
 
-        printf("Connection depuis %s, %d",
+        _tprintf(_T("Connection depuis %s, %d"),
                inet_ntoa(sinRemote.sin_addr),
                ntohs(sinRemote.sin_port));
 
@@ -102,7 +105,7 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
 void CloseServer(const SOCKET *s)
 {
     closesocket(*s);
-    puts("Server closed.");
+    _putts(_T("Server closed."));
 }
 
 
@@ -128,7 +131,7 @@ _Bool ShutdownConnection(SOCKET sd)
             return 0;
         }
         else if (nNewBytes != 0) {
-            printf("FYI, received %d unexpected bytes during shutdown.\n", nNewBytes);
+            _tprintf(_T("FYI, received %d unexpected bytes during shutdown.\n"), nNewBytes);
         }
         else {
             // Okay, we're done!
