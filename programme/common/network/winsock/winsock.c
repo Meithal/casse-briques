@@ -35,7 +35,7 @@ int StopWinsock()
     return 0;
 }
 
-void StartServer(SOCKET * s, DWORD WINAPI (ThreadServeur)(void* sd_))
+void StartServer(SOCKET * s, DWORD (ThreadServeur)(void* sd_))
 {
     struct sockaddr_in server;
 
@@ -91,7 +91,6 @@ void CloseServer(const SOCKET *s)
 
 _Bool ShutdownConnection(SOCKET sd)
 {
-    int kBufferSize = 1024;
     // Disallow any further data sends.  This will tell the other side
     // that we want to go away now.  If we skip this step, we don't
     // shut the connection down nicely.
@@ -104,9 +103,9 @@ _Bool ShutdownConnection(SOCKET sd)
     // acknowledges the TCP control packet sent by the shutdown above.
     // Then we'll get a 0 back from recv, signalling that the remote
     // host has closed its side of the connection.
-    char acReadBuffer[kBufferSize];
+    char acReadBuffer[K_BUFFER_SIZE];
     while (1) {
-        int nNewBytes = recv(sd, acReadBuffer, kBufferSize, 0);
+        int nNewBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
         if (nNewBytes == SOCKET_ERROR) {
             return 0;
         }

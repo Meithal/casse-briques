@@ -71,11 +71,10 @@ DWORD WINAPI ThreadServeur(void* sd_) {
 
 bool ConnectionClient(SOCKET sd) {
     // Read data from client
-    int kBufferSize = 1024;
-    char acReadBuffer[kBufferSize];
+    char acReadBuffer[K_BUFFER_SIZE];
     int nReadBytes;
     do {
-        nReadBytes = recv(sd, acReadBuffer, kBufferSize, 0);
+        nReadBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
         if (nReadBytes > 0) {
             printf("Received %d bytes from client.\n", nReadBytes);
 

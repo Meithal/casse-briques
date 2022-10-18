@@ -6,10 +6,13 @@
 #define CASSES_BRIQUES_WINSOCK_H
 
 #include "winsock2.h"
+#include "windows.h"
+
+#define K_BUFFER_SIZE 1024
 
 int StartWinsock();
 int StopWinsock();
-void StartServer(SOCKET * s, DWORD WINAPI (ThreadServeur)(void* sd_));
+void StartServer(SOCKET * s, DWORD (ThreadServeur)(void* sd_));
 void CloseServer(const SOCKET *s);
 _Bool ShutdownConnection(SOCKET sd);
 
