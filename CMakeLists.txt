@@ -49,7 +49,7 @@ add_custom_command(
         TARGET ${PROJECT_NAME}-gui POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/assets"
-        "${PROJECT_BINARY_DIR}/assets"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}-gui>/assets"
         VERBATIM)
 
 execute_process(COMMAND python download-deps.py WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/programme")
