@@ -6,6 +6,7 @@ https://trello.com/b/UwwzTs6c/kanban
 
 * Télécharger cmake https://cmake.org/ 
 (l'executable doit être dans $PATH)
+* Installer VisualStudio avec compilateur c++ https://visualstudio.microsoft.com/fr/
 * Redémarrer la console
 * `mkdir build`
 * `cd build`
