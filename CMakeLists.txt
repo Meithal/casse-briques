@@ -34,14 +34,16 @@ if(WIN32)
     target_link_libraries(casses_briques-cli PRIVATE wsock32 ws2_32)
     target_link_libraries(casses_briques-server PRIVATE wsock32 ws2_32)
     target_sources(casses_briques-gui PRIVATE
-            programme/common/network/winsock/winsock.c
-            programme/common/network/winsock/winsock.h)
+            programme/common/network/winsock/winsock_utils.c
+            programme/common/network/winsock/winsock_utils.h)
     target_sources(casses_briques-cli PRIVATE
-            programme/common/network/winsock/winsock.c
-            programme/common/network/winsock/winsock.h)
+            programme/common/network/winsock/winsock_utils.c
+            programme/common/network/winsock/winsock_utils.h)
     target_sources(casses_briques-server PRIVATE
-            programme/common/network/winsock/winsock.c
-            programme/common/network/winsock/winsock.h)
+            programme/common/network/winsock/winsock_utils.c
+            programme/common/network/winsock/winsock_utils.h)
+
+    target_compile_definitions(casses_briques-cli PRIVATE _UNICODE)
 endif()
 
 

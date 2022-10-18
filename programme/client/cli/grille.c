@@ -13,26 +13,29 @@
 int main () {
     field vide = {
             .visual = 32,
-            .txt = ' ',
+            .txt = _T(' '),
             .destructible = 0,
     };
     field bricks = {
             .visual = 176,
-            .txt = 'm',
+            .txt = _T('m'),
             .destructible = 1,
     };
     field mur = {
             .visual = 219,
-            .txt = 'x',
+            .txt = _T('x'),
             .destructible = 0,
     };
 #ifdef _WIN32
     EnableVTMode();
+    SetupConsoleForUnicode();
 #endif
-    puts("Bienvenue dans le casse briques.");
-    puts("Appuyez sur une touche pour continuer.");
+    _putts(_TEXT("tesr"));
+    fflush(stdout);
+    _putts(L"Bienvenueé dans le casse briques.");
+    _putts(_TEXT("Appuyez sur une touche pour continuer."));
     getchar();
-    puts("\033[2J\033[H");
+    _putts(_TEXT("\033[2J\033[H"));
 
     FILE *f = fopen("assets/maps/grille1.txt","r");
     if (f == NULL) {
@@ -49,15 +52,15 @@ int main () {
         char lettre = fgetc(f);
         while (lettre!=EOF) {
             if (lettre==mur.txt) {
-                printf("%c",mur.visual);
+                _tprintf(_T("%c"),mur.visual);
             } else if (lettre==bricks.txt) {
-                printf("%c",bricks.visual);
+                _tprintf(_T("%c"),bricks.visual);
             } else if (lettre==vide.txt) {
-                printf("%c",vide.visual);
+                _tprintf(_T("%c"),vide.visual);
             } else if (lettre=='p') {
-                printf("p");
+                _tprintf(_T("p"));
             } else {
-                printf("\n");
+                _tprintf(_T("\n"));
             }
             lettre = fgetc(f);
         }

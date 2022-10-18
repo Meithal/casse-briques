@@ -8,7 +8,7 @@
 #include "SDL.h"
 
 #include "common/structures.h"
-#include "common/network/winsock/winsock.h"
+#include "common/network/winsock/winsock_utils.h"
 #include "freetype-functions.h"
 
 //SDL_Window * createSDL

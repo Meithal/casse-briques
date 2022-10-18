@@ -26,3 +26,18 @@ _Bool EnableVTMode()
     }
     return 1;
 }
+
+int SetupConsoleForUnicode() {
+    int result = 0;
+#ifndef _UNICODE
+    return result;
+#endif
+    // Set "stdin" to have wide text mode:
+    result = _setmode( _fileno( stdout ), _O_WTEXT );
+    if( result == -1 )
+        perror( "Cannot set mode" );
+    else
+        printf( "'stdin' successfully changed to binary mode\n" );
+
+    return result;
+}

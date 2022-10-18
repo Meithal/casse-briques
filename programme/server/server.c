@@ -7,12 +7,12 @@
 #include <winsock2.h>
 #include <stdbool.h>
 
-#include "common/network/winsock/winsock.h"
+#include "common/network/winsock/winsock_utils.h"
 
 #include "server.h"
 
 bool ConnectionClient(SOCKET sd);
-DWORD WINAPI ThreadServeur(void* sd_);
+LPTHREAD_START_ROUTINE ThreadServeur(void* sd_);
 
 int main()
 {
@@ -48,7 +48,7 @@ int main()
     return 0;
 }
 
-DWORD WINAPI ThreadServeur(void* sd_) {
+LPTHREAD_START_ROUTINE ThreadServeur(void* sd_) {
     int nRetval = 0;
     SOCKET sd = (SOCKET)sd_;
 

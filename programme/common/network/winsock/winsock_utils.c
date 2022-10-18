@@ -3,7 +3,7 @@
 // Contient du code d'ici https://tangentsoft.net/wskfaq/examples/basics/index.html
 //
 
-#include "winsock.h"
+#include "winsock_utils.h"
 #include "stdio.h"
 
 int StartWinsock()
@@ -35,7 +35,25 @@ int StopWinsock()
     return 0;
 }
 
-void StartServer(SOCKET * s, DWORD (ThreadServeur)(void* sd_))
+TCHAR * FriendlyErrorMessage(int errorCode, DWORD bufferLen, LPSTR buffer) {
+
+    if(0==FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM,
+            NULL,
+            errorCode,
+            LANG_USER_DEFAULT, buffer, bufferLen, NULL
+            )) {
+
+        static TCHAR error[256] = {0};
+        return TEXT("Fail to generate error message for code %d");
+
+        return error;
+    }
+
+    return "";
+}
+
+void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
 {
     struct sockaddr_in server;
 
@@ -60,7 +78,7 @@ void StartServer(SOCKET * s, DWORD (ThreadServeur)(void* sd_))
 
     puts("Bind done.");
 
-    listen(*s, SOMAXCONN);
+//    listen(*s, SOMAXCONN);
 
     while (1) {
         struct sockaddr_in sinRemote;
