@@ -4,6 +4,8 @@
 
 #include "stdio.h"
 #include "string.h"
+#include <wchar.h>
+#include <locale.h>
 
 #include "common/structures.h"
 #ifdef _WIN32
@@ -11,18 +13,19 @@
 #endif
 
 int main () {
+    setlocale(LC_CTYPE, "");
     field vide = {
-            .visual = 32,
+            .visual = 0x0020,
             .txt = _T(' '),
             .destructible = 0,
     };
     field bricks = {
-            .visual = 176,
+            .visual = 0x2591,
             .txt = _T('m'),
             .destructible = 1,
     };
     field mur = {
-            .visual = 219,
+            .visual = 0x2588,
             .txt = _T('x'),
             .destructible = 0,
     };
@@ -52,11 +55,11 @@ int main () {
         char lettre = fgetc(f);
         while (lettre!=EOF) {
             if (lettre==mur.txt) {
-                _tprintf(_T("%c"),mur.visual);
+                wprintf(L"%lc", mur.visual);
             } else if (lettre==bricks.txt) {
-                _tprintf(_T("%c"),bricks.visual);
+                wprintf(L"%lc", bricks.visual);
             } else if (lettre==vide.txt) {
-                _tprintf(_T("%c"),vide.visual);
+                wprintf(L"%lc", vide.visual);
             } else if (lettre=='p') {
                 _tprintf(_T("p"));
             } else {

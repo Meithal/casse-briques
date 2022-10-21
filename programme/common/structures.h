@@ -7,7 +7,7 @@
 
 typedef struct field field;
 struct field {
-    int visual;
+    wchar_t visual;
     char txt;
     int destructible;
 };
