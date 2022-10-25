@@ -12,6 +12,10 @@ struct field {
     int destructible;
 };
 
+typedef struct board board;
+struct board {
+    struct field *** board;
+};
 
 
 #endif //CASES_BRIQUES_STRUCTURES_H

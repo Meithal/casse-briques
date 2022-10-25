@@ -37,7 +37,7 @@ int StopWinsock()
     return 0;
 }
 
-TCHAR * FriendlyErrorMessage(int errorCode, DWORD bufferLen, LPSTR buffer) {
+_TCHAR * FriendlyErrorMessage(int errorCode, DWORD bufferLen, _TCHAR *buffer) {
 
     if(0==FormatMessage(
             FORMAT_MESSAGE_FROM_SYSTEM,
@@ -46,7 +46,7 @@ TCHAR * FriendlyErrorMessage(int errorCode, DWORD bufferLen, LPSTR buffer) {
             LANG_USER_DEFAULT, buffer, bufferLen, NULL
             )) {
 
-        static TCHAR error[256] = {0};
+        static _TCHAR error[256] = {0};
         _stprintf(error, bufferLen, _T("Fail to generate error message for code %ld"), GetLastError());
 
         return error;
@@ -85,7 +85,7 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
     while (1) {
         struct sockaddr_in sinRemote;
         int sinsize = sizeof(sinRemote);
-        TCHAR errBuffer[256];
+        _TCHAR errBuffer[256];
         SOCKET sd;
         if((sd = accept(*s, (struct sockaddr*)&sinRemote, &sinsize)) ==INVALID_SOCKET) {
             _tprintf(_T("Connéction invalide %s\n"), FriendlyErrorMessage(WSAGetLastError(), 256, errBuffer));

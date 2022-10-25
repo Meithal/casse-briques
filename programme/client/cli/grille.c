@@ -27,12 +27,21 @@ int main () {
             .destructible = 0,
     };
 #ifdef _WIN32
+    puts("win32 detected");
     EnableVTMode();
     SetupConsoleForUnicode();
+    LoadCharmap();
+#endif
+#ifdef _UNICODE
+    const int wide = 1;
+#define W "l"
+#else
+    const int wide = 0;
+#define W ""
 #endif
     _putts(_TEXT("tesr"));
     fflush(stdout);
-    _putts(L"Bienvenueé dans le casse briques.");
+    _putts(_T("Biénvenue dans le casse briques."));
     _putts(_TEXT("Appuyez sur une touche pour continuer."));
     getchar();
     _putts(_TEXT("\033[2J\033[H"));
@@ -52,11 +61,11 @@ int main () {
         char lettre = fgetc(f);
         while (lettre!=EOF) {
             if (lettre==mur.txt) {
-                _tprintf(_T("%c"),mur.visual);
+                _tprintf(_T("%"W"c"),wide ? charmap[mur.visual] : mur.visual);
             } else if (lettre==bricks.txt) {
-                _tprintf(_T("%c"),bricks.visual);
+                _tprintf(_T("%"W"c"),wide ? charmap[bricks.visual] : bricks.visual);
             } else if (lettre==vide.txt) {
-                _tprintf(_T("%c"),vide.visual);
+                _tprintf(_T("%"W"c"),wide ? charmap[vide.visual] : vide.visual);
             } else if (lettre=='p') {
                 _tprintf(_T("p"));
             } else {

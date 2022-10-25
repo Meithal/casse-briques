@@ -13,18 +13,21 @@ add_executable(casses_briques-gui
         programme/client/gui/freetype-functions.h
         programme/client/gui/sdl-functions.c
         programme/client/gui/sdl-functions.h
-        )
+        programme/common/game_rules/gameRules.c
+        programme/common/game_rules/gameRules.h)
 target_include_directories(casses_briques-gui PRIVATE programme)
 
 add_executable(casses_briques-cli
         programme/client/cli/grille.c
-        )
+        programme/common/game_rules/gameRules.c
+        programme/common/game_rules/gameRules.h)
 target_include_directories(casses_briques-cli PRIVATE programme)
 
 add_executable(casses_briques-server
         programme/server/server.h
         programme/server/server.c
-        )
+        programme/common/game_rules/gameRules.c
+        programme/common/game_rules/gameRules.h)
 target_include_directories(casses_briques-server PRIVATE programme)
 
 if(WIN32)
@@ -50,6 +53,8 @@ if(WIN32)
 
     target_compile_definitions(casses_briques-server PRIVATE _UNICODE)
     target_compile_definitions(casses_briques-cli PRIVATE _UNICODE)
+    target_compile_definitions(casses_briques-server PRIVATE UNICODE)
+    target_compile_definitions(casses_briques-cli PRIVATE UNICODE)
 endif()
 
 
