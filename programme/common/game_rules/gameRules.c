@@ -59,7 +59,7 @@ int loadMap(char* path, board * board)
     char c;
     for (int i = 0 ; i < lignes * cols ; i++) {
         fscanf(f, " %c", &c);
-        board->board[i] = (struct tile) {
+        (*board->board)[i] = (struct tile) {
             .type = (c == 'p' || c == vide.txt) ? &vide : c == mur.txt ? &mur : &bricks,
             .destroyed = 0
         };
@@ -87,20 +87,35 @@ void unloadMap(board *board) {
     free(board->board);
 }
 
-void mapView(_TCHAR *buffer, board *board) {
-    _tcscat(buffer, _T("player #: "));
-    _TCHAR buf[5] = {0};
-    _stprintf(buf, 5, _T("%d"), board->nb_players);
-    _tcscat(buffer, buf);
-    _tcscat(buffer, _T("\n"));
+void mapView(int size, _TCHAR *buffer, board *board) {
+    int written = 0;
+    written += _stprintf(
+            buffer+written,
+            size,
+            _T("player #: %d rows %d cols %d\n"),
+            board->nb_players,
+            board->rows,
+            board->cols
+            );
+//    _TCHAR buf[5] = {0};
+//    _stprintf(buf, 5, _T("%d"), board->nb_players);
+//    _tcscat(buffer, buf);
+//    _tcscat(buffer, _T("\n"));
 
     for (int j = 0; j < board->rows ; j++) {
         for (int i = 0; i < board->cols; ++i) {
-            _tcscat(buffer, &(_TCHAR [2]){wide?charmap[board->board[j*i+i].type->visual]:board->board[j*i+i].type->visual, 0});
+            written+=_stprintf(
+                    buffer+written, size, _T("%lc"),
+                      wide?charmap[(*board->board)->type->visual]:(*board->board)->type->visual
+                      );
+//            _tcscat(buffer, (const _TCHAR *) &(_TCHAR[2]) {
+//                    wide ? charmap[board->board[j * i + i].type->visual] : board->board[j * i + i].type->visual,
+//                    _T('\0')
+//            });
         }
-        _tcscat(buffer, _T("\n"));
+        written += _stprintf(buffer+written, size, _T("\n"));
 
     }
-    _tcscat(buffer, _T("\n"));
+//    _tcscat(buffer, _T("\n"));
 
 }

@@ -71,12 +71,13 @@ int main()
 
 #ifdef _WIN32
     SetupConsoleForUnicode();
+    LoadCharmap();
 #endif
 
     board board;
     loadMap("assets/maps/grille1.txt", &board);
     _TCHAR buf[0x100] = {0};
-    mapView(buf, &board);
+    mapView(0x100, buf, &board);
     _putts(buf);
     fflush(stdout);
 

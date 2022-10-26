@@ -22,7 +22,7 @@ typedef struct board board;
 struct board {
     int rows;
     int cols;
-    struct tile * board;
+    struct tile (* board)[];
     int nb_players;
     struct player * players;
 };

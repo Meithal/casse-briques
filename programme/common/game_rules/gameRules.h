@@ -11,6 +11,6 @@
 
 int loadMap(char* path, board * board);
 void unloadMap(board * board);
-void mapView(_TCHAR * buffer, board * board);
+void mapView(int size, _TCHAR * buffer, board * board);
 
 #endif //CASSES_BRIQUES_GAMERULES_H
