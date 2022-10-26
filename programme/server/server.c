@@ -9,11 +9,16 @@
 
 #include "common/network/winsock/winsock_utils.h"
 
+
 #ifdef _WIN32
 #include "client/cli/windows_compatibility/winterm.h"
 #endif
 
 #include "server.h"
+#include "common/game_rules/gameRules.h"
+#ifdef _UNICODE
+const int wide =1;
+#endif
 
 bool ConnectionClient(SOCKET sd);
 
@@ -67,6 +72,13 @@ int main()
 #ifdef _WIN32
     SetupConsoleForUnicode();
 #endif
+
+    board board;
+    loadMap("assets/maps/grille1.txt", &board);
+    _TCHAR buf[0x100] = {0};
+    mapView(buf, &board);
+    _putts(buf);
+    fflush(stdout);
 
     StartWinsock();
     SOCKET s;

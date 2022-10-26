@@ -15,7 +15,7 @@ int StartWinsock()
     {
         _tprintf(_T("Winsock fail to initialize error code %d"), WSAGetLastError());
         return 1;
-    };
+    }
     /* ... */
 
     _putts(_T("winsock demarre"));

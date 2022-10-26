@@ -5,9 +5,12 @@
 #ifndef CASSES_BRIQUES_GAMERULES_H
 #define CASSES_BRIQUES_GAMERULES_H
 
+#include "tchar.h"
+
 #include "common/structures.h"
 
-void loadMap(char* path, board * board);
+int loadMap(char* path, board * board);
 void unloadMap(board * board);
+void mapView(_TCHAR * buffer, board * board);
 
 #endif //CASSES_BRIQUES_GAMERULES_H
