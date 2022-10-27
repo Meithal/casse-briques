@@ -48,7 +48,6 @@ if(WIN32)
             programme/common/network/winsock/winsock_utils.h
             programme/client/cli/windows_compatibility/winterm.c
             programme/client/cli/windows_compatibility/winterm.h
-
             )
 
     target_compile_definitions(casses_briques-server PRIVATE _UNICODE)
@@ -60,6 +59,18 @@ endif()
 
 add_custom_command(
         TARGET ${PROJECT_NAME}-gui POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}-gui>/assets"
+        VERBATIM)
+add_custom_command(
+        TARGET ${PROJECT_NAME}-cli POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}-gui>/assets"
+        VERBATIM)
+add_custom_command(
+        TARGET ${PROJECT_NAME}-server POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/assets"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}-gui>/assets"

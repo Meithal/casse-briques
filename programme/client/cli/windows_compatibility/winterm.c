@@ -7,6 +7,12 @@
 
 int charmap[0xff] = {0};
 
+#ifdef _UNICODE
+const int wide = 1;
+#else
+const int wide = 0;
+#endif
+
 _Bool EnableVTMode()
 {
     // Set output mode to handle virtual terminal sequences

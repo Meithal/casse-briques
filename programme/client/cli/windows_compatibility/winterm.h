@@ -16,5 +16,14 @@ _Bool EnableVTMode();
 int SetupConsoleForUnicode();
 
 extern int charmap[0xff];
+extern const int wide;
+
+
 void LoadCharmap();
+#ifdef _UNICODE
+#define W "l"
+#else
+#define W ""
+#endif
+
 #endif //CASSES_BRIQUES_WINTERM_H

@@ -18,32 +18,26 @@ struct tile {
     int destroyed;
 };
 
-typedef struct board board;
-struct board {
-    int rows;
-    int cols;
-    struct tile (* board)[];
-    int nb_players;
-    struct player * players;
-};
-
-extern field vide;
-extern field bricks;
-extern field mur;
-
 typedef struct player player;
 struct player {
     int line;
     int col;
 };
 
-#ifdef _UNICODE
-extern const int wide;
-#define W "l"
-#else
-extern const int wide;
-#define W ""
-#endif
+typedef struct board board;
+struct board {
+    int rows;
+    int cols;
+    struct tile (* board)[][42];
+    int nb_players;
+    struct player (* players)[];
+};
+
+extern field vide;
+extern field bricks;
+extern field mur;
+
+
 
 
 #endif //CASES_BRIQUES_STRUCTURES_H
