@@ -16,9 +16,8 @@
 
 #include "server.h"
 #include "common/game_rules/gameRules.h"
-#ifdef _UNICODE
-const int wide =1;
-#endif
+extern const int wide;
+extern int charmap[0xff];
 
 bool ConnectionClient(SOCKET sd);
 

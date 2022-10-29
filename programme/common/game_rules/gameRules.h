@@ -13,4 +13,8 @@ int loadMap(char* path, board * board);
 void unloadMap(board * board);
 void mapView(int size, _TCHAR * buffer, board * board);
 
+extern int charmap[0xff];
+extern const int wide;
+
+
 #endif //CASSES_BRIQUES_GAMERULES_H

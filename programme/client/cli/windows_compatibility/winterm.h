@@ -15,9 +15,8 @@
 _Bool EnableVTMode();
 int SetupConsoleForUnicode();
 
-extern int charmap[0xff];
-extern const int wide;
-
+//int charmap[0xff];
+//const int wide;
 
 void LoadCharmap();
 #ifdef _UNICODE
