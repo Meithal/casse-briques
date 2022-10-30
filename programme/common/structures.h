@@ -22,6 +22,7 @@ typedef struct player player;
 struct player {
     int line;
     int col;
+    int is_ia;
 };
 
 typedef struct board board;

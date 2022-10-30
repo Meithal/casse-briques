@@ -12,6 +12,7 @@
 int loadMap(char* path, board * board);
 void unloadMap(board * board);
 void mapView(int size, _TCHAR * buffer, board * board);
+int setAIPlayers(int number, board * board);
 
 extern int charmap[0xff];
 extern const int wide;

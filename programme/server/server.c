@@ -82,6 +82,7 @@ int main()
             loadMap(buf, &board);
             _putts("Combien de IA vont jouer dans la map ?");
             int ias = askIntInput(0, board.nb_players);
+            setAIPlayers(ias, &board);
 
             startMap(&board);
         }

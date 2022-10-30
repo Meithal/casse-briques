@@ -83,6 +83,7 @@ int loadMap(char* path, board * board)
             board->players = newPlayers;
             (*board->players)[players].line = j;
             (*board->players)[players].col = i;
+            (*board->players)[players].is_ia = 0;
 
             players++;
         }
@@ -104,3 +105,12 @@ void unloadMap(board *board) {
     free(board->board);
 }
 
+int setAIPlayers(int number, board * board)
+{
+    if(number > board->nb_players) {
+        return 0;
+    }
+    while(number--) {
+        (*board->players)[number].is_ia = 1;
+    }
+}
