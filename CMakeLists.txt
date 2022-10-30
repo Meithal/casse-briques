@@ -76,9 +76,9 @@ add_custom_command(
         "$<TARGET_FILE_DIR:${PROJECT_NAME}-gui>/assets"
         VERBATIM)
 
-execute_process(COMMAND python download-deps.py WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/programme")
+execute_process(COMMAND python download-deps.py WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 
-add_subdirectory(programme/vendor/sdl2 EXCLUDE_FROM_ALL)
+add_subdirectory(vendor/sdl2 EXCLUDE_FROM_ALL)
 
 if(TARGET SDL2::SDL2main)
     # It has an implicit dependency on SDL2 functions, so it MUST be added before SDL2::SDL2 (or SDL2::SDL2-static)
@@ -104,6 +104,6 @@ set(FT_DISABLE_BZIP2 TRUE)
 set(FT_DISABLE_PNG TRUE)
 set(FT_DISABLE_HARFBUZZ TRUE)
 set(FT_DISABLE_BROTLI TRUE)
-add_subdirectory(programme/vendor/freetype)
+add_subdirectory(vendor/freetype)
 
 target_link_libraries(casses_briques-gui PRIVATE freetype)
