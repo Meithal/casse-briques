@@ -68,10 +68,10 @@ if(WIN32)
             programme/client/cli/windows_compatibility/winterm.h
             )
 
-#    target_compile_definitions(casses_briques-server PRIVATE _UNICODE)
-#    target_compile_definitions(casses_briques-cli PRIVATE _UNICODE)
-#    target_compile_definitions(casses_briques-server PRIVATE UNICODE)
-#    target_compile_definitions(casses_briques-cli PRIVATE UNICODE)
+    target_compile_definitions(casses_briques-server PRIVATE _UNICODE)
+    target_compile_definitions(casses_briques-cli PRIVATE _UNICODE)
+    target_compile_definitions(casses_briques-server PRIVATE UNICODE)
+    target_compile_definitions(casses_briques-cli PRIVATE UNICODE)
 endif()
 
 

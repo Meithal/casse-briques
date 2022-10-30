@@ -9,7 +9,7 @@ int askIntInput(int lowIncluded, int highIncluded)
 {
     long val;
     do {
-        _tprintf("(%d-%d)>", lowIncluded, highIncluded);
+        _tprintf(_T("(%d-%d)>"), lowIncluded, highIncluded);
         fflush(stdout);
         char buffer[5] = {0};
 
@@ -21,7 +21,7 @@ int askIntInput(int lowIncluded, int highIncluded)
         if(end - buffer == written && val >= lowIncluded && val <= highIncluded) {
             break;
         }
-        puts("Nombre invalide");
+        _putts(_T("Nombre invalide"));
     }while (1);
 
     return val;

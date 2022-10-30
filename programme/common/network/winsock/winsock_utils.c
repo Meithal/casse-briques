@@ -6,7 +6,7 @@
 #include "winsock_utils.h"
 #include "stdio.h"
 #include "tchar.h"
-
+#include "client/cli/windows_compatibility/winterm.h"
 
 int shutdownAsked = 0;
 SOCKET client_sockets[0X10];
@@ -64,7 +64,6 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
     struct sockaddr_in server;
     int client_sockets_i = 0;
 
-
     //Create a socket
     if((*s = socket(AF_INET , SOCK_STREAM , 0 )) == INVALID_SOCKET)
     {
@@ -73,6 +72,20 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
     }
 
     _tprintf(_T("Socket created.\n"));
+
+    unsigned long ul = 1;
+    int nRet = ioctlsocket(*s, FIONBIO, (unsigned long *) &ul);
+    if(nRet == SOCKET_ERROR) {
+        _TCHAR errBuffer[256];
+
+        _tprintf(_T("Could not put socket in non blocking mode: %s") , FriendlyErrorMessage(
+                WSAGetLastError(), 256, errBuffer)
+                );
+        goto cleanup;
+
+    }
+
+
 
 
     server.sin_family = AF_INET;
@@ -97,7 +110,8 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
         _TCHAR errBuffer[256];
         SOCKET sd;
         if((sd = accept(*s, (struct sockaddr*)&sinRemote, &sinsize)) ==INVALID_SOCKET) {
-            _tprintf(_T("Connéction invalide %s\n"), FriendlyErrorMessage(WSAGetLastError(), 256, errBuffer));
+            _tprintf(_T("Connéction invalide %"W"s\n"), FriendlyErrorMessage(
+                    WSAGetLastError(), 256, errBuffer));
             goto cleanup;
         }
 

@@ -63,8 +63,8 @@ int main()
     LoadCharmap();
 #endif
 
-    _putts("1. Voir les parties en cours.");
-    _putts("2. Host une nouvelle partie.");
+    _putts(_T("1. Voir les parties en cours."));
+    _putts(_T("2. Host une nouvelle partie."));
 
     int input = askIntInput(1, 2);
 
@@ -80,7 +80,7 @@ int main()
             sprintf(buf, "assets/maps/grille%d.txt", map);
             board board;
             loadMap(buf, &board);
-            _putts("Combien de IA vont jouer dans la map ?");
+            _putts(_T("Combien de IA vont jouer dans la map ?"));
             int ias = askIntInput(0, board.nb_players);
             setAIPlayers(ias, &board);
 
@@ -188,11 +188,11 @@ static int showAvailableMaps(char * folder) {
         board board;
 
         loadMap(buf, &board);
-//        _TCHAR buf[0x100] = {0};
-        mapView(0x100, buf, &board);
+        _TCHAR bufOut[0x100] = {0};
+        mapView(0x100, bufOut, &board);
        // _putts(buf);
 
-        _tprintf(_T("%d. %s\n%s"), ret+1, desc->d_name, buf);
+        _tprintf(_T("%d. %s\n%"W"s"), ret+1, desc->d_name, bufOut);
         ret++;
     }
 
@@ -203,5 +203,7 @@ static int showAvailableMaps(char * folder) {
 }
 
 void intHandler(int val) {
+    _tprintf(_T("sigint recu %d"), val);
+    fflush(stdout);
     return;
 }
