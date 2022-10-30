@@ -69,7 +69,7 @@ int loadMap(char* path, board * board)
     for (int j = 0 ; j < lignes ; j++) {
         for (int i = 0; i < cols; i++) {
             fscanf(f, "%c", &c);
-            (*board->board)[j][i] = (struct tile) {
+            (*board->board)[j*cols+i] = (struct tile) {
                     .type = (c == 'p' || c == vide.txt) ? &vide : c == mur.txt ? &mur : &bricks,
                     .destroyed = 0
             };

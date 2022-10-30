@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include <winsock2.h>
+#include"dirent.h"
 
 #include "common/network/winsock/winsock_utils.h"
 
@@ -28,6 +29,7 @@ static void startMap(char * mapPath, board * board);
 DWORD WINAPI ThreadServeur(LPVOID sd_);
 
 void intHandler(int dummy);
+static int showAvailableMaps(char * folder);
 
 int main()
 {
@@ -66,11 +68,22 @@ int main()
 
     int input = askIntInput(1, 2);
 
-    _tprintf(_T("%d"), input);
-    fflush(stdout);
+    switch (input) {
+        case 1:
+            // todo
+        case 2:
+        default: {
+            int mapsNumber = showAvailableMaps("assets/maps");
+            int map = askIntInput(1, mapsNumber);
 
-    board board;
-    startMap("assets/maps/grille2.txt", &board);
+            char buf[256];
+            sprintf(buf, "assets/maps/grille%d.txt", map);
+            board board;
+            startMap(buf, &board);
+
+        }
+
+    }
 
     return 0;
 }
@@ -86,10 +99,11 @@ static void startMap(char * mapPath, board * board)
 
     StartWinsock();
     SOCKET s;
+    fflush(stdout);
+
     StartServer(&s, (LPTHREAD_START_ROUTINE) ThreadServeur, 41480);
     CloseServer(&s);
     StopWinsock();
-
 }
 
 bool ConnectionClient(SOCKET sd) {
@@ -149,6 +163,40 @@ DWORD WINAPI ThreadServeur(LPVOID sd_) {
     }
 
     return nRetval;
+}
+
+static int showAvailableMaps(char * folder) {
+
+    int ret = 0;
+    DIR * fol;
+    fol = opendir(folder);
+    if(fol == NULL) {
+        perror(strerror(errno));
+        goto cleanup;
+    }
+    struct dirent * desc = NULL;
+    while((desc = readdir(fol)) != NULL) {
+        if(desc->d_name[0] == '.') {
+            continue;
+        }
+
+        char buf[0x100];
+        sprintf(buf, "%s/grille%d.txt", folder, ret +1);
+        board board;
+
+        loadMap(buf, &board);
+//        _TCHAR buf[0x100] = {0};
+        mapView(0x100, buf, &board);
+       // _putts(buf);
+
+        _tprintf(_T("%d. %s\n%s"), ret+1, desc->d_name, buf);
+        ret++;
+    }
+
+    cleanup:
+    if(fol) closedir(fol);
+
+    return ret;
 }
 
 void intHandler(int val) {

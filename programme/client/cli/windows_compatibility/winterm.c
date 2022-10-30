@@ -101,7 +101,7 @@ void mapView(int size, _TCHAR *buffer, board *board) {
 
     for (int j = 0; j < board->rows ; j++) {
         for (int i = 0; i < board->cols; ++i) {
-            int vis = (*board->board)[j][i].type->visual;
+            int vis = (*board->board)[j*board->cols + i].type->visual;
             written+=_sntprintf(
                     buffer+written, size - written - 1, _T("%"W"c"),
                     wide?charmap[vis]:vis

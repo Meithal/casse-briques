@@ -9,7 +9,8 @@ int askIntInput(int lowIncluded, int highIncluded)
 {
     long val;
     do {
-        _tprintf(">");
+        _tprintf("(%d-%d)>", lowIncluded, highIncluded);
+        fflush(stdout);
         char buffer[5] = {0};
 
         int written = fscanf(stdin, "%4s", buffer);
