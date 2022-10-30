@@ -75,16 +75,16 @@ int loadMap(char* path, board * board)
             };
 
         if(c == 'p') {
-//            void * newPlayers = realloc(board->players, sizeof (struct player) * (players + 1));
-//            if(newPlayers == NULL) {
-//                unloadMap(board);
-//                return 1;
-//            }
-//            board->players = newPlayers;
-//            (*board->players)[players].line = j;
-//            (*board->players)[players].col = i;
-//
-//            players++;
+            void * newPlayers = realloc(board->players, sizeof (struct player) * (players + 1));
+            if(newPlayers == NULL) {
+                unloadMap(board);
+                return 1;
+            }
+            board->players = newPlayers;
+            (*board->players)[players].line = j;
+            (*board->players)[players].col = i;
+
+            players++;
         }
         }
         fgetc(f);

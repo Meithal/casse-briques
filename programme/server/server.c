@@ -25,7 +25,7 @@ extern const int wide;
 extern int charmap[0xff];
 
 bool ConnectionClient(SOCKET sd);
-static void startMap(char * mapPath, board * board);
+static void startMap(board * board);
 DWORD WINAPI ThreadServeur(LPVOID sd_);
 
 void intHandler(int dummy);
@@ -79,8 +79,11 @@ int main()
             char buf[256];
             sprintf(buf, "assets/maps/grille%d.txt", map);
             board board;
-            startMap(buf, &board);
+            loadMap(buf, &board);
+            _putts("Combien de IA vont jouer dans la map ?");
+            int ias = askIntInput(0, board.nb_players);
 
+            startMap(&board);
         }
 
     }
@@ -89,9 +92,8 @@ int main()
 }
 
 
-static void startMap(char * mapPath, board * board)
+static void startMap(board * board)
 {
-    loadMap(mapPath, board);
     _TCHAR buf[0x100] = {0};
     mapView(0x100, buf, board);
     _putts(buf);
