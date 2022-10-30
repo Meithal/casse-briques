@@ -4,7 +4,6 @@
 
 #include "stdio.h"
 
-#include "conio.h"
 #include "SDL.h"
 
 #include "common/structures.h"

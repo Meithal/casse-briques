@@ -20,17 +20,35 @@ target_include_directories(casses_briques-gui PRIVATE programme)
 add_executable(casses_briques-cli
         programme/client/cli/grille.c
         programme/common/game_rules/gameRules.c
-        programme/common/game_rules/gameRules.h)
+        programme/common/game_rules/gameRules.h
+        programme/client/cli/askIntInput.c
+        programme/client/cli/askIntInput.h
+)
 target_include_directories(casses_briques-cli PRIVATE programme)
 
 add_executable(casses_briques-server
         programme/server/server.h
         programme/server/server.c
         programme/common/game_rules/gameRules.c
-        programme/common/game_rules/gameRules.h)
+        programme/common/game_rules/gameRules.h
+        programme/client/cli/askIntInput.c
+        programme/client/cli/askIntInput.h
+)
 target_include_directories(casses_briques-server PRIVATE programme)
 
+if(UNIX)
+    message("POSIX DETECTED")
+    target_sources(casses_briques-cli PRIVATE
+            programme/client/cli/linux_compatibility/conio_polyfill.c
+            programme/client/cli/linux_compatibility/conio_polyfill.h)
+    target_sources(casses_briques-server PRIVATE
+            programme/client/cli/linux_compatibility/conio_polyfill.c
+            programme/client/cli/linux_compatibility/conio_polyfill.h)
+
+endif()
+
 if(WIN32)
+    message("WINDOWS DETECTED")
     target_link_libraries(casses_briques-gui PRIVATE wsock32 ws2_32)
     target_link_libraries(casses_briques-cli PRIVATE wsock32 ws2_32)
     target_link_libraries(casses_briques-server PRIVATE wsock32 ws2_32)

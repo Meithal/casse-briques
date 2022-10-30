@@ -4,6 +4,13 @@
 
 #include "stdio.h"
 
+#ifdef _WIN32
+#include "conio.h"
+#else
+#include "client/cli/linux_compatibility/conio_polyfill.h"
+#endif
+
+
 #include "common/structures.h"
 #ifdef _WIN32
 #include "client/cli/windows_compatibility/winterm.h"

@@ -4,8 +4,10 @@
 
 #include "stdio.h"
 
-#include <winsock2.h>
+#include "signal.h"
 #include <stdbool.h>
+
+#include <winsock2.h>
 
 #include "common/network/winsock/winsock_utils.h"
 
@@ -16,32 +18,16 @@
 
 #include "server.h"
 #include "common/game_rules/gameRules.h"
+#include "client/cli/askIntInput.h"
+
 extern const int wide;
 extern int charmap[0xff];
 
 bool ConnectionClient(SOCKET sd);
+static void startMap(char * mapPath, board * board);
+DWORD WINAPI ThreadServeur(LPVOID sd_);
 
-DWORD WINAPI ThreadServeur(LPVOID sd_) {
-    int nRetval = 0;
-    SOCKET sd = (SOCKET)sd_;
-
-    if (!ConnectionClient(sd)) {
-        printf("Erreur avec le client\n");
-        nRetval = 3;
-    }
-
-    puts("Fermeture connection avec client...");
-    if (ShutdownConnection(sd)) {
-        printf("Connection is down.");
-    }
-    else {
-        fprintf(stderr, "Connection shutdown failed\n");
-        nRetval = 3;
-    }
-
-    return nRetval;
-}
-
+void intHandler(int dummy);
 
 int main()
 {
@@ -68,27 +54,43 @@ int main()
 //    }
     /* On devrait faire closesocket(sock); puis WSACleanup(); mais puisqu'on a entré une boucle infinie ... */
 
+    signal(SIGINT, intHandler);
+
 #ifdef _WIN32
     SetupConsoleForUnicode();
     LoadCharmap();
 #endif
 
+    _putts("1. Voir les parties en cours.");
+    _putts("2. Host une nouvelle partie.");
+
+    int input = askIntInput(1, 2);
+
+    _tprintf(_T("%d"), input);
+    fflush(stdout);
+
     board board;
-    loadMap("assets/maps/grille1.txt", &board);
+    startMap("assets/maps/grille2.txt", &board);
+
+    return 0;
+}
+
+
+static void startMap(char * mapPath, board * board)
+{
+    loadMap(mapPath, board);
     _TCHAR buf[0x100] = {0};
-    mapView(0x100, buf, &board);
+    mapView(0x100, buf, board);
     _putts(buf);
     fflush(stdout);
 
     StartWinsock();
     SOCKET s;
-    StartServer(&s, (LPTHREAD_START_ROUTINE) ThreadServeur);
+    StartServer(&s, (LPTHREAD_START_ROUTINE) ThreadServeur, 41480);
     CloseServer(&s);
     StopWinsock();
 
-    return 0;
 }
-
 
 bool ConnectionClient(SOCKET sd) {
     // Read data from client
@@ -125,4 +127,30 @@ bool ConnectionClient(SOCKET sd) {
 
     _putts(_T("Connection closed by peer."));
     return true;
+}
+
+
+DWORD WINAPI ThreadServeur(LPVOID sd_) {
+    int nRetval = 0;
+    SOCKET sd = (SOCKET)sd_;
+
+    if (!ConnectionClient(sd)) {
+        printf("Erreur avec le client\n");
+        nRetval = 3;
+    }
+
+    puts("Fermeture connection avec client...");
+    if (ShutdownConnection(sd)) {
+        printf("Connection is down.");
+    }
+    else {
+        fprintf(stderr, "Connection shutdown failed\n");
+        nRetval = 3;
+    }
+
+    return nRetval;
+}
+
+void intHandler(int val) {
+    return;
 }

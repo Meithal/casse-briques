@@ -8,12 +8,16 @@
 #include "tchar.h"
 
 
+int shutdownAsked = 0;
+SOCKET client_sockets[0X10];
+
 int StartWinsock()
 {
-    WSADATA WSAData;
-    if(WSAStartup(MAKEWORD(2,0), &WSAData) != 0)
+    WSADATA WSAData = {0};
+    if(WSAStartup(MAKEWORD(2,2), &WSAData) != 0)
     {
         _tprintf(_T("Winsock fail to initialize error code %d"), WSAGetLastError());
+        WSACleanup();
         return 1;
     }
     /* ... */
@@ -47,7 +51,7 @@ _TCHAR * FriendlyErrorMessage(int errorCode, DWORD bufferLen, _TCHAR *buffer) {
             )) {
 
         static _TCHAR error[256] = {0};
-        _stprintf(error, bufferLen, _T("Fail to generate error message for code %ld"), GetLastError());
+        _sntprintf(error, bufferLen, _T("Fail to generate error message for code %ld"), GetLastError());
 
         return error;
     }
@@ -55,14 +59,17 @@ _TCHAR * FriendlyErrorMessage(int errorCode, DWORD bufferLen, _TCHAR *buffer) {
     return buffer;
 }
 
-void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
+void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPort)
 {
     struct sockaddr_in server;
+    int client_sockets_i = 0;
+
 
     //Create a socket
     if((*s = socket(AF_INET , SOCK_STREAM , 0 )) == INVALID_SOCKET)
     {
         _tprintf(_T("Could not create socket : %d") , WSAGetLastError());
+        goto cleanup;
     }
 
     _tprintf(_T("Socket created.\n"));
@@ -70,17 +77,19 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( 41480 );
+    server.sin_port = htons( serverPort );
 
     //Bind
     if( bind(*s ,(struct sockaddr *)&server , sizeof(server)) == SOCKET_ERROR)
     {
         _tprintf(_T("Bind failed with error code : %d") , WSAGetLastError());
+        goto cleanup;
     }
 
     _putts(_T("Bind done."));
 
     listen(*s, SOMAXCONN);
+
 
     while (1) {
         struct sockaddr_in sinRemote;
@@ -89,8 +98,10 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
         SOCKET sd;
         if((sd = accept(*s, (struct sockaddr*)&sinRemote, &sinsize)) ==INVALID_SOCKET) {
             _tprintf(_T("Connéction invalide %s\n"), FriendlyErrorMessage(WSAGetLastError(), 256, errBuffer));
-            return;
+            goto cleanup;
         }
+
+        printf("loop\n");
 
         _tprintf(_T("Connection depuis %s, %d"),
                inet_ntoa(sinRemote.sin_addr),
@@ -100,6 +111,16 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur)
 
         CreateThread(0, 0, ThreadServeur, (void *) sd, 0, &nThreadId);
     }
+
+cleanup:
+    while (client_sockets_i--) {
+        closesocket(client_sockets[client_sockets_i + 1]);
+    }
+    if (s != NULL)
+        closesocket(*s);
+    WSACleanup();
+
+    return;
 }
 
 void CloseServer(const SOCKET *s)
