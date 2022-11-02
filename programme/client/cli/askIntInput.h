@@ -5,8 +5,9 @@
 #ifndef CASSES_BRIQUES_ASKINTINPUT_H
 #define CASSES_BRIQUES_ASKINTINPUT_H
 
+#include <tchar.h>
 #include "stdio.h"
 #include "stdlib.h"
 
-int askIntInput(int lowIncluded, int highIncluded);
+int askIntInput(_TCHAR *prompt, int lowIncluded, int highIncluded);
 #endif //CASSES_BRIQUES_ASKINTINPUT_H

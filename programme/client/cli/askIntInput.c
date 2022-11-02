@@ -2,14 +2,16 @@
 // Created by Utilisateur on 30/10/2022.
 //
 
-#include "askIntInput.h"
 #include "tchar.h"
+#include "client/cli/windows_compatibility/winterm.h"
 
-int askIntInput(int lowIncluded, int highIncluded)
+#include "askIntInput.h"
+
+int askIntInput(_TCHAR *prompt, int lowIncluded, int highIncluded)
 {
     long val;
     do {
-        _tprintf(_T("(%d-%d)>"), lowIncluded, highIncluded);
+        _tprintf(_T("%"W"s (%d-%d)>"), prompt ? prompt : _T(""), lowIncluded, highIncluded);
         fflush(stdout);
         char buffer[5] = {0};
 

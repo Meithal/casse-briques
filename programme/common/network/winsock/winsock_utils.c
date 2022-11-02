@@ -85,7 +85,7 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
 
     if(nRet == SOCKET_ERROR) {
 
-        _tprintf(_T("Could not put socket in non blocking mode: %s") , FriendlyErrorMessage(
+        _tprintf(_T("Could not put socket in non blocking mode: %"W"s") , FriendlyErrorMessage(
                 WSAGetLastError())
                 );
         goto cleanup;
@@ -126,7 +126,7 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
             if(WSAGetLastError() == WSAEWOULDBLOCK) {
                 continue;
             }
-            _tprintf(_T("Connéction invalide %"W"s\n"), FriendlyErrorMessage(
+            _tprintf(_T("Connection invalide %"W"s\n"), FriendlyErrorMessage(
                     WSAGetLastError()));
             goto cleanup;
         }

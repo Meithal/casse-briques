@@ -26,10 +26,16 @@ extern int charmap[0xff];
 
 bool ConnectionClient(SOCKET sd);
 static void startMap(board * board);
+DWORD WINAPI ThreadClient(LPVOID sd_);
 DWORD WINAPI ThreadServeur(LPVOID sd_);
 
 void intHandler(int dummy);
 static int showAvailableMaps(char * folder);
+
+int serverThreadIdx = 0;
+HANDLE serverThreads[20];
+
+HANDLE consoleWriteMutex;
 
 int main()
 {
@@ -57,37 +63,72 @@ int main()
     /* On devrait faire closesocket(sock); puis WSACleanup(); mais puisqu'on a entré une boucle infinie ... */
 
     signal(SIGINT, intHandler);
-
+    HANDLE thr;
 #ifdef _WIN32
     SetupConsoleForUnicode();
     LoadCharmap();
 #endif
-
+do {
     _putts(_T("1. Voir les parties en cours."));
     _putts(_T("2. Host une nouvelle partie."));
+    _putts(_T("3. Arrêter le serveur."));
 
-    int input = askIntInput(1, 2);
+    int input = askIntInput(NULL, 1, 3);
 
     switch (input) {
         case 1:
             // todo
         case 2:
         default: {
-            int mapsNumber = showAvailableMaps("assets/maps");
-            int map = askIntInput(1, mapsNumber);
+            DWORD nThreadId;
 
-            char buf[256];
-            sprintf(buf, "assets/maps/grille%d.txt", map);
-            board board;
-            loadMap(buf, &board);
-            _putts(_T("Combien de IA vont jouer dans la map ?"));
-            int ias = askIntInput(0, board.nb_players);
-            setAIPlayers(ias, &board);
+            thr = CreateThread(0, 0, ThreadServeur, NULL, 0, &nThreadId);
+            if (thr == NULL) {
+                _tprintf(_T("failed to create server thread: %d"), GetLastError());
+            }
+            serverThreads[serverThreadIdx++] = thr;
+            _tprintf(_T("Thread serveur crée: thid %d\n"), nThreadId);
+            fflush(stdout);
 
-            startMap(&board);
+            consoleWriteMutex = CreateMutex(
+                    NULL, FALSE, _T("Local\\ConsoleWriteMutex")
+            );
+
+            if(consoleWriteMutex == NULL) {
+                _tprintf(_T("Error creating mutex %"W"s"), FriendlyErrorMessage(GetLastError()));
+            }
+            ReleaseMutex(consoleWriteMutex);
+            Sleep(200);
+
+            DWORD wait = WaitForSingleObject(consoleWriteMutex, INFINITE);
+            switch (wait) {
+                case WAIT_ABANDONED: {
+                    _putts(_T("Owning thread terminated"));
+                    break;
+                }
+                case WAIT_OBJECT_0: {
+                    _putts(_T("Thread signaled"));
+                    break;
+                }
+                case WAIT_TIMEOUT: {
+                    _putts(_T("Timeout elapsed"));
+                    break;
+                }
+                default:
+                case WAIT_FAILED: {
+                    _tprintf(_T("Thread failed %"W"s\n"), FriendlyErrorMessage(GetLastError()));
+                }
+            }
+            break;
         }
-
+        case 3:
+            goto exit;
     }
+} while (1);
+    exit:
+
+    CloseHandle(thr);
+    CloseHandle(consoleWriteMutex);
 
     return 0;
 }
@@ -104,7 +145,7 @@ static void startMap(board * board)
     SOCKET s;
     fflush(stdout);
 
-    StartServer(&s, (LPTHREAD_START_ROUTINE) ThreadServeur, 41480);
+    StartServer(&s, (LPTHREAD_START_ROUTINE) ThreadClient, 41480);
     CloseServer(&s);
     StopWinsock();
 }
@@ -146,8 +187,29 @@ bool ConnectionClient(SOCKET sd) {
     return true;
 }
 
+DWORD WINAPI ThreadServeur(LPVOID sd_)
+{
+    int retVal = 0;
+    WaitForSingleObject(consoleWriteMutex, INFINITE);
 
-DWORD WINAPI ThreadServeur(LPVOID sd_) {
+    int mapsNumber = showAvailableMaps("assets/maps");
+    int map = askIntInput(_T("Quelle carte ?"), 1, mapsNumber);
+
+    char buf[256];
+    sprintf(buf, "assets/maps/grille%d.txt", map);
+    board board;
+    loadMap(buf, &board);
+    int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board.nb_players);
+    setAIPlayers(ias, &board);
+
+    startMap(&board);
+
+    ReleaseMutex(consoleWriteMutex);
+
+    return retVal;
+}
+
+DWORD WINAPI ThreadClient(LPVOID sd_) {
     int nRetval = 0;
     SOCKET sd = (SOCKET)sd_;
 
