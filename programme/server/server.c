@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 #include <winsock2.h>
-#include"dirent.h"
+#include "dirent.h"
 
 #include "common/network/winsock/winsock_utils.h"
 

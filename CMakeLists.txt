@@ -74,6 +74,12 @@ if(WIN32)
     target_compile_definitions(casses_briques-cli PRIVATE UNICODE)
 endif()
 
+if(MSVC)
+    message("Including dirent polyfill.")
+    target_include_directories(casses_briques-server PRIVATE ${CMAKE_SOURCE_DIR}/vendor/dirent/include)
+    target_include_directories(casses_briques-cli PRIVATE ${CMAKE_SOURCE_DIR}/vendor/dirent/include)
+    target_include_directories(casses_briques-gui PRIVATE ${CMAKE_SOURCE_DIR}/vendor/dirent/include)
+endif()
 
 add_custom_command(
         TARGET ${PROJECT_NAME}-gui POST_BUILD
