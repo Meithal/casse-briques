@@ -40,30 +40,14 @@ HANDLE consoleWriteMutex;
 
 int main()
 {
-//    WSADATA WSAData;
-//    SOCKET sock;
-//    SOCKET csock;
-//    SOCKADDR_IN sin;
-//    SOCKADDR_IN csin;
-//    WSAStartup(MAKEWORD(2,0), &WSAData);
-//    sock = socket(AF_INET, SOCK_STREAM, 0);
-//    sin.sin_addr.s_addr = INADDR_ANY;
-//    sin.sin_family = AF_INET;
-//    sin.sin_port = htons(23);
-//    bind(sock, (SOCKADDR *)&sin, sizeof(sin));
-//    listen(sock, 0);
-//    while(1) /* Boucle infinie. Exercice : améliorez ce code. */
-//    {
-//        int sinsize = sizeof(csin);
-//        if((csock = accept(sock, (SOCKADDR *)&csin, &sinsize)) != INVALID_SOCKET)
-//        {
-//            send(csock, "Hello world!\r\n", 14, 0);
-//            closesocket(csock);
-//        }
-//    }
     /* On devrait faire closesocket(sock); puis WSACleanup(); mais puisqu'on a entré une boucle infinie ... */
 
+    errno = 0;
     signal(SIGINT, intHandler);
+    if(errno) {
+        perror(strerror(errno));
+    }
+
     HANDLE thr;
 #ifdef _WIN32
     SetupConsoleForUnicode();
@@ -136,6 +120,8 @@ int main()
 } while (1);
     exit:
 
+    shutdownAsked = 1;
+
     CloseHandle(thr);
     CloseHandle(consoleWriteMutex);
     CloseHandle(consoleWriteEvent);
@@ -163,7 +149,6 @@ static void startMap(board * board)
 DWORD WINAPI ThreadServeur(LPVOID sd_)
 {
     int retVal = 0;
-    WaitForSingleObject(consoleWriteMutex, INFINITE);
 
     int mapsNumber = showAvailableMaps("assets/maps");
     int map = askIntInput(_T("Quelle carte ?"), 1, mapsNumber);

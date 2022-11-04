@@ -68,7 +68,7 @@ _TCHAR * FriendlyErrorMessage(DWORD errorCode) {
     return friendlyBuffer;
 }
 
-void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPort)
+void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort)
 {
     struct sockaddr_in server;
     WSAEVENT listenSocketEvent;
@@ -124,7 +124,8 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
     };
 
     while (1) {
-//        _putts(_T("loop\n"));
+
+        if(shutdownAsked) goto cleanup;
 
         struct sockaddr_in sinRemote;
         int sinsize = sizeof(sinRemote);
@@ -145,7 +146,7 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
 
         DWORD nThreadId;
 
-        CreateThread(0, 0, ThreadServeur, (void *) sd, 0, &nThreadId);
+        CreateThread(0, 0, ThreadClient, (void *) sd, 0, &nThreadId);
     }
 
 cleanup:return;
