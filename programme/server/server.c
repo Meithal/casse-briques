@@ -37,6 +37,7 @@ HANDLE serverThreads[20];
 
 HANDLE consoleWriteMutex;
 
+
 int main()
 {
 //    WSADATA WSAData;
@@ -68,7 +69,11 @@ int main()
     SetupConsoleForUnicode();
     LoadCharmap();
 #endif
-do {
+    consoleWriteEvent = CreateEvent(
+            NULL, TRUE, FALSE, TEXT("WaitConsole")
+    );
+
+    do {
     _putts(_T("1. Voir les parties en cours."));
     _putts(_T("2. Host une nouvelle partie."));
     _putts(_T("3. Arrêter le serveur."));
@@ -82,7 +87,9 @@ do {
         default: {
             DWORD nThreadId;
 
-            thr = CreateThread(0, 0, ThreadServeur, NULL, 0, &nThreadId);
+            thr = CreateThread(
+                    NULL, 0,
+                    ThreadServeur, NULL, 0, &nThreadId);
             if (thr == NULL) {
                 _tprintf(_T("failed to create server thread: %d"), GetLastError());
             }
@@ -90,17 +97,19 @@ do {
             _tprintf(_T("Thread serveur crée: thid %d\n"), nThreadId);
             fflush(stdout);
 
-            consoleWriteMutex = CreateMutex(
-                    NULL, FALSE, _T("Local\\ConsoleWriteMutex")
-            );
+//            consoleWriteMutex = CreateMutex(
+//                    NULL, FALSE, _T("Local\\ConsoleWriteMutex")
+//            );
 
-            if(consoleWriteMutex == NULL) {
-                _tprintf(_T("Error creating mutex %"W"s"), FriendlyErrorMessage(GetLastError()));
-            }
-            ReleaseMutex(consoleWriteMutex);
-            Sleep(200);
 
-            DWORD wait = WaitForSingleObject(consoleWriteMutex, INFINITE);
+//            if(consoleWriteMutex == NULL) {
+//                _tprintf(_T("Error creating mutex %"W"s"), FriendlyErrorMessage(GetLastError()));
+//            }
+//            ReleaseMutex(consoleWriteMutex);
+//            Sleep(200);
+
+            ResetEvent(consoleWriteEvent);
+            DWORD wait = WaitForSingleObject(consoleWriteEvent, INFINITE);
             switch (wait) {
                 case WAIT_ABANDONED: {
                     _putts(_T("Owning thread terminated"));
@@ -129,6 +138,7 @@ do {
 
     CloseHandle(thr);
     CloseHandle(consoleWriteMutex);
+    CloseHandle(consoleWriteEvent);
 
     return 0;
 }
@@ -149,6 +159,27 @@ static void startMap(board * board)
     CloseServer(&s);
     StopWinsock();
 }
+
+DWORD WINAPI ThreadServeur(LPVOID sd_)
+{
+    int retVal = 0;
+    WaitForSingleObject(consoleWriteMutex, INFINITE);
+
+    int mapsNumber = showAvailableMaps("assets/maps");
+    int map = askIntInput(_T("Quelle carte ?"), 1, mapsNumber);
+
+    char buf[256];
+    sprintf(buf, "assets/maps/grille%d.txt", map);
+    board board;
+    loadMap(buf, &board);
+    int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board.nb_players);
+    setAIPlayers(ias, &board);
+
+    startMap(&board);
+
+    return retVal;
+}
+
 
 bool ConnectionClient(SOCKET sd) {
     // Read data from client
@@ -187,27 +218,6 @@ bool ConnectionClient(SOCKET sd) {
     return true;
 }
 
-DWORD WINAPI ThreadServeur(LPVOID sd_)
-{
-    int retVal = 0;
-    WaitForSingleObject(consoleWriteMutex, INFINITE);
-
-    int mapsNumber = showAvailableMaps("assets/maps");
-    int map = askIntInput(_T("Quelle carte ?"), 1, mapsNumber);
-
-    char buf[256];
-    sprintf(buf, "assets/maps/grille%d.txt", map);
-    board board;
-    loadMap(buf, &board);
-    int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board.nb_players);
-    setAIPlayers(ias, &board);
-
-    startMap(&board);
-
-    ReleaseMutex(consoleWriteMutex);
-
-    return retVal;
-}
 
 DWORD WINAPI ThreadClient(LPVOID sd_) {
     int nRetval = 0;

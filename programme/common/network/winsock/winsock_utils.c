@@ -11,6 +11,8 @@
 int shutdownAsked = 0;
 SOCKET client_sockets[0X10];
 int client_sockets_i = 0;
+HANDLE consoleWriteEvent;
+
 
 int StartWinsock()
 {
@@ -104,6 +106,11 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadServeur, int serverPor
     }
 
     _putts(_T("Bind done."));
+
+    if(!SetEvent(consoleWriteEvent)) {
+        _fputts( _T("Impossible de signaler un evenement!"), stderr);
+    }
+
 
     //Create event
     listenSocketEvent = WSACreateEvent();

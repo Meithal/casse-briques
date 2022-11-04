@@ -18,4 +18,7 @@ void CloseServer(const SOCKET *s);
 _Bool ShutdownConnection(SOCKET sd);
 _TCHAR * FriendlyErrorMessage(DWORD errorCode);
 
+extern HANDLE consoleWriteEvent;
+
+
 #endif //CASSES_BRIQUES_WINSOCK_UTILS_H
