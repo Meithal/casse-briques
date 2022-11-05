@@ -25,6 +25,7 @@
 
 DWORD WINAPI threadServerListenClient(LPVOID sd_);
 DWORD WINAPI threadServeur(LPVOID phosted_game);
+void onConnectCallback(SOCKET sock);
 
 void intHandler(int val);
 static int showAvailableMaps(char * folder);
@@ -182,15 +183,47 @@ DWORD WINAPI threadServeur(LPVOID phosted_game)
     hostedGame->mapNumber = map;
 
     SOCKET s;
-    startServer(&s, (LPTHREAD_START_ROUTINE) threadServerListenClient, &hostedGame->serverPort);
+    startServer(
+            &s,
+            (LPTHREAD_START_ROUTINE) threadServerListenClient,
+            &hostedGame->serverPort
+    );
     closeServer(&s);
 
     return retVal;
 }
 
+void onConnectCallback(SOCKET sock)
+{
+    int nTemp = send(sock, "wru",4, 0); // who are you
+    if (nTemp > 0) {
+        _tprintf(_T("Envoyé %d bytes au client.\n"), nTemp);
+    }
+    else if (nTemp == SOCKET_ERROR) {
+        return;
+    }
+    else {
+        // Client closed connection before we could reply to
+        // all the data it sent, so bomb out early.
+        _putts(_T("Pair a fermé la connexion de manière inattendue !"));
+        return;
+    }
+
+    int nReadBytes;
+    char responseBuf[10] = {0};
+    wchar_t wideBuf[10] = {0};
+    do {
+        nReadBytes = recv(sock, responseBuf, 10, 0);
+        mbtowc(wideBuf, responseBuf, nReadBytes);
+        _putts(wideBuf);
+    } while (nReadBytes != 0);
+}
+
 DWORD WINAPI threadServerListenClient(LPVOID sd_) {
     int nRetval = 0;
     SOCKET sd = (SOCKET)sd_;
+
+    onConnectCallback(sd);
 
     if (!connectionClient(sd)) {
         _putts(_T("Erreur avec le client"));
@@ -213,8 +246,7 @@ DWORD WINAPI threadServerListenClient(LPVOID sd_) {
 static int showAvailableMaps(char * folder) {
 
     int ret = 0;
-    DIR * fol;
-    fol = opendir(folder);
+    DIR * fol = opendir(folder);
     if(fol == NULL) {
         perror(strerror(errno));
         goto cleanup;

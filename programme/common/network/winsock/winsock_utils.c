@@ -68,7 +68,7 @@ _TCHAR * friendlyErrorMessage(DWORD errorCode) {
     return friendlyBuffer;
 }
 
-void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int * serverPort)
+void startServer(SOCKET * s, LPTHREAD_START_ROUTINE threadServerListenClient, int * serverPort)
 {
     struct sockaddr_in server;
     WSAEVENT listenSocketEvent;
@@ -118,7 +118,6 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int * serverPo
         _fputts( _T("Impossible de signaler un evenement!"), stderr);
     }
 
-
     //Create event
     listenSocketEvent = WSACreateEvent();
 
@@ -153,7 +152,8 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int * serverPo
 
         DWORD nThreadId;
 
-        CreateThread(0, 0, ThreadClient, (void *) sd, 0, &nThreadId);
+
+        CreateThread(0, 0, threadServerListenClient, (void *) sd, 0, &nThreadId);
     }
 
 cleanup:return;
