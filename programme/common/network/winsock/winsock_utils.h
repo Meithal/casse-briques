@@ -25,7 +25,7 @@ void closeServer(const SOCKET *s);
 _Bool shutdownConnection(SOCKET sd);
 _Bool connectionClient(SOCKET sd);
 _TCHAR * friendlyErrorMessage(DWORD errorCode);
-void startClient(char* address, int port);
+SOCKET startClient(char* address, int port);
 void closeClient(SOCKET s);
 
 extern int shutdownAsked;

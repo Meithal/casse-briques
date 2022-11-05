@@ -55,6 +55,7 @@ struct hosted_game {
         } hostData;
         struct {
             SOCKET clientSocket;
+            char * serverMessages;
         } clientData;
     };
 };

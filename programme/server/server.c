@@ -197,7 +197,7 @@ void onConnectCallback(SOCKET sock)
 {
     int nTemp = send(sock, "wru",4, 0); // who are you
     if (nTemp > 0) {
-        _tprintf(_T("Envoyé %d bytes au client.\n"), nTemp);
+//        _tprintf(_T("Envoyé %d bytes au client.\n"), nTemp);
     }
     else if (nTemp == SOCKET_ERROR) {
         return;
@@ -209,14 +209,14 @@ void onConnectCallback(SOCKET sock)
         return;
     }
 
-    int nReadBytes;
-    char responseBuf[10] = {0};
-    wchar_t wideBuf[10] = {0};
-    do {
-        nReadBytes = recv(sock, responseBuf, 10, 0);
-        mbtowc(wideBuf, responseBuf, nReadBytes);
-        _putts(wideBuf);
-    } while (nReadBytes != 0);
+//    int nReadBytes;
+//    char responseBuf[10] = {0};
+//    wchar_t wideBuf[10] = {0};
+//    do {
+//        nReadBytes = recv(sock, responseBuf, 10, 0);
+//        mbtowc(wideBuf, responseBuf, nReadBytes);
+//        _putts(wideBuf);
+//    } while (nReadBytes != 0);
 }
 
 DWORD WINAPI threadServerListenClient(LPVOID sd_) {

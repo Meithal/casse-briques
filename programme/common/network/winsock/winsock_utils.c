@@ -159,16 +159,13 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE threadServerListenClient, in
 cleanup:return;
 }
 
-void startClient(char* address, int port)
+SOCKET startClient(char* address, int port)
 {
     SOCKET ConnectSocket = INVALID_SOCKET;
     struct addrinfo *result = NULL,
             *ptr = NULL,
             hints;
-    const char *sendbuf = "this is a test";
-    char recvbuf[K_BUFFER_SIZE];
     int iResult;
-    int recvbuflen = K_BUFFER_SIZE;
 
     ZeroMemory( &hints, sizeof(hints) );
     hints.ai_family = AF_UNSPEC;
@@ -183,7 +180,7 @@ void startClient(char* address, int port)
     if ( iResult != 0 ) {
         _tprintf(_T("getaddrinfo failed with error: %d\n"), iResult);
 
-        return;
+        return NULL;
     }
 
     // Attempt to connect to an address until one succeeds
@@ -195,7 +192,7 @@ void startClient(char* address, int port)
         if (ConnectSocket == INVALID_SOCKET) {
             _tprintf(_T("socket failed with error: %ld\n"), WSAGetLastError());
 
-            return;
+            return NULL;
         }
 
         // Connect to server.
@@ -211,33 +208,12 @@ void startClient(char* address, int port)
     freeaddrinfo(result);
 
     if (ConnectSocket == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
-        return;
+        _tprintf(_T("Unable to connect to server!\n"));
+        return NULL;
     }
 
-    // Send an initial buffer
-    iResult = send( ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
-    if (iResult == SOCKET_ERROR) {
-        printf("send failed with error: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-
-        return;
-    }
-
-    _tprintf(_T("Bytes Sent: %ld\n"), iResult);
-
-    // Receive until the peer closes the connection
-    do {
-        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        if ( iResult > 0 )
-            _tprintf(_T("Bytes received: %d\n"), iResult);
-        else if ( iResult == 0 )
-            _tprintf(_T("Connection closed\n"));
-        else
-            _tprintf(_T("recv failed with error: %d\n"), WSAGetLastError());
-
-    } while( iResult > 0 );
-
+    _tprintf(_T("Connected to server!\n"));
+    return ConnectSocket;
 }
 
 void closeClient(const SOCKET s)
