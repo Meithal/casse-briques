@@ -3,9 +3,6 @@
 //
 
 #include "winterm.h"
-#include "errno.h"
-
-#include "common/structures.h"
 
 int charmap[0xff] = {0};
 #ifdef _UNICODE

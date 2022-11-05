@@ -47,9 +47,16 @@ struct hosted_game {
     board *board;
     int mapNumber;
     int serverPort;
-    SOCKET serverSocket;
-    int nbClients;
-    clientPlayer clientPlayers[];
+    union {
+        struct {
+            SOCKET serverSocket;
+            int nbClients;
+            clientPlayer clientPlayers[];
+        } hostData;
+        struct {
+            SOCKET serverSocket;
+        } clientData;
+    };
 };
 
 extern field vide;

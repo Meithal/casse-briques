@@ -128,7 +128,7 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int * serverPo
     if(listen(*s, SOMAXCONN) == SOCKET_ERROR) {
         _tprintf(_T("Error setting : %d") , WSAGetLastError());
         goto cleanup;
-    };
+    }
 
     while (1) {
 
@@ -158,6 +158,100 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int * serverPo
 
 cleanup:return;
 }
+
+void startClient(char* address, int port)
+{
+    SOCKET ConnectSocket = INVALID_SOCKET;
+    struct addrinfo *result = NULL,
+            *ptr = NULL,
+            hints;
+    const char *sendbuf = "this is a test";
+    char recvbuf[K_BUFFER_SIZE];
+    int iResult;
+    int recvbuflen = K_BUFFER_SIZE;
+
+    ZeroMemory( &hints, sizeof(hints) );
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    // Resolve the server address and port
+    char servicePort[10] = {0};
+    sprintf(servicePort, "%d", port);
+
+    iResult = getaddrinfo(address, servicePort, &hints, &result);
+    if ( iResult != 0 ) {
+        _tprintf(_T("getaddrinfo failed with error: %d\n"), iResult);
+
+        return;
+    }
+
+    // Attempt to connect to an address until one succeeds
+    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
+
+        // Create a SOCKET for connecting to server
+        ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
+                               ptr->ai_protocol);
+        if (ConnectSocket == INVALID_SOCKET) {
+            _tprintf(_T("socket failed with error: %ld\n"), WSAGetLastError());
+
+            return;
+        }
+
+        // Connect to server.
+        iResult = connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+        if (iResult == SOCKET_ERROR) {
+            closesocket(ConnectSocket);
+            ConnectSocket = INVALID_SOCKET;
+            continue;
+        }
+        break;
+    }
+
+    freeaddrinfo(result);
+
+    if (ConnectSocket == INVALID_SOCKET) {
+        printf("Unable to connect to server!\n");
+        return;
+    }
+
+    // Send an initial buffer
+    iResult = send( ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
+    if (iResult == SOCKET_ERROR) {
+        printf("send failed with error: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+
+        return;
+    }
+
+    _tprintf(_T("Bytes Sent: %ld\n"), iResult);
+
+    // shutdown the connection since no more data will be sent
+    iResult = shutdown(ConnectSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        _tprintf(_T("shutdown failed with error: %d\n"), WSAGetLastError());
+        closesocket(ConnectSocket);
+
+        return;
+    }
+
+    // Receive until the peer closes the connection
+    do {
+
+        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+        if ( iResult > 0 )
+            _tprintf(_T("Bytes received: %d\n"), iResult);
+        else if ( iResult == 0 )
+            _tprintf(_T("Connection closed\n"));
+        else
+            _tprintf(_T("recv failed with error: %d\n"), WSAGetLastError());
+
+    } while( iResult > 0 );
+
+    // cleanup
+    closesocket(ConnectSocket);
+}
+
 
 void closeServer(const SOCKET *s)
 {

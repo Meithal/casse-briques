@@ -132,7 +132,7 @@ int getPlacesRestantes(hosted_game * hostedGame)
         }
     }
 
-    restant -= hostedGame->nbClients;
+    restant -= hostedGame->hostData.nbClients;
 
     return restant;
 }
