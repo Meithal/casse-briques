@@ -149,3 +149,15 @@ hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[hostedGames
         }
     }
 }
+
+player * playerAtPosition(board*board, int y, int x)
+{
+    for(int i = 0 ; i < board->nb_players ; i++)
+    {
+        player player = (*board->players)[i];
+        if(player.col == x && player.line == y) {
+            return &(*board->players)[i];
+        }
+    }
+    return NULL;
+}

@@ -18,6 +18,7 @@
 #endif
 
 #include "common/game_rules/gameRules.h"
+#include "client/cli/grilleDisplay.h"
 #include "client/cli/askIntInput.h"
 
 DWORD WINAPI threadServerListenClient(LPVOID sd_);
@@ -70,7 +71,7 @@ int main()
             _putts(_T("Parties en cours :"));
             for (int i = 0; i < hostedGamesIdx; ++i) {
                 _TCHAR bufOut[0x100] = {0};
-                mapView(0x100, bufOut, hostedGames[i].board);
+                mapView(0x100, bufOut, hostedGames[i].board, NULL);
 
                 _tprintf(_T("%d. \033[33mPlaces restantes : %d\033[0m\n%"W"s"),
                     i+1,
@@ -207,13 +208,26 @@ DWORD WINAPI threadServerListenClient(LPVOID sd_) {
     return nRetval;
 }
 
+char* afficheJoueurs(int currentTile, struct player * player)
+{
+    return "p";
+}
+
 DWORD WINAPI threadClient(LPVOID phosted_game)
 {
     hosted_game * hostedGame = phosted_game;
     _putts(_T("Bienvenue dans la partie en cours"));
     _putts(_T("Appuyez sur les flèches pour vous déplacer, q pour quitter."));
 
+    _tprintf(_T("\033[2J"));
+
     while(1) {
+        Sleep(200);
+        _tprintf(_T("\033[H"));
+        _TCHAR bufOut[0x100] = {0};
+        mapView(0x100, bufOut, hostedGame->board, afficheJoueurs);
+        _putts(bufOut);
+
         if(kbhit()) {
             int ch = getch();
 
@@ -250,7 +264,7 @@ static int showAvailableMaps(char * folder) {
 
         loadMap(buf, &board);
         _TCHAR bufOut[0x100] = {0};
-        mapView(0x100, bufOut, &board);
+        mapView(0x100, bufOut, &board, NULL);
        // _putts(buf);
         wchar_t longName[MAX_PATH] = {0};
         mbtowc(longName, desc->d_name, desc->d_namlen);

@@ -7,7 +7,13 @@
 
 #include "tchar.h"
 #include "common/structures.h"
+#include "common/game_rules/gameRules.h"
 #include "client/cli/windows_compatibility/winterm.h"
 
-void mapView(int size, _TCHAR *buffer, board *board);
+void mapView(
+    int size,
+    _TCHAR *buffer,
+    board *board,
+    char *(*displayCallback)(int currentTile, struct player *player)
+);
 #endif //CASSES_BRIQUES_GRILLEDISPLAY_H
