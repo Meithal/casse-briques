@@ -136,3 +136,16 @@ int getPlacesRestantes(hosted_game * hostedGame)
 
     return restant;
 }
+
+hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[hostedGamesMax], int idx)
+{
+    int found = 1;
+    for(int i = 0; i < hostedGamesMax ; i++, found++) {
+        if(!getPlacesRestantes(&games[i])) {
+            continue;
+        }
+        if(found == idx) {
+            return &games[i];
+        }
+    }
+}

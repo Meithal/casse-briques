@@ -19,9 +19,9 @@
 #include "common/game_rules/gameRules.h"
 #include "client/cli/askIntInput.h"
 
-static void startMap(board * board);
 DWORD WINAPI threadServerListenClient(LPVOID sd_);
 DWORD WINAPI threadServeur(LPVOID phosted_game);
+DWORD WINAPI threadClient(LPVOID phosted_game);
 
 void intHandler(int val);
 static int showAvailableMaps(char * folder);
@@ -94,7 +94,13 @@ int main()
             if(input == found+1) {
                 break;
             } else {
-
+                CreateThread(
+                        NULL, 0,
+                        threadClient, hostedGameFromIdx(hostedGamesIdx, hostedGames, input),
+                        0, NULL
+                );
+                ResetEvent(consoleWriteEvent);
+                WaitForSingleObject(consoleWriteEvent, INFINITE);
             }
             break;
         }
@@ -200,6 +206,13 @@ DWORD WINAPI threadServerListenClient(LPVOID sd_) {
     return nRetval;
 }
 
+DWORD WINAPI threadClient(LPVOID phosted_game)
+{
+    hosted_game * hostedGame = phosted_game;
+    _putts(_T("Bienvenue dans la partie en cours"));
+
+    return 0;
+}
 
 static int showAvailableMaps(char * folder) {
 
