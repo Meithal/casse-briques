@@ -23,9 +23,9 @@ extern const int wide;
 int main () {
 #ifdef _WIN32
     puts("win32 detected");
-    EnableVTMode();
-    SetupConsoleForUnicode();
-    LoadCharmap();
+    enableVtMode();
+    setupConsoleForUnicode();
+    loadCharmap();
 #endif
     _putts(_TEXT("tesr"));
     fflush(stdout);

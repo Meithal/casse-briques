@@ -14,7 +14,7 @@ int client_sockets_i = 0;
 HANDLE consoleWriteEvent;
 
 
-int StartWinsock()
+int startWinsock()
 {
     WSADATA WSAData = {0};
     if(WSAStartup(MAKEWORD(2,2), &WSAData) != 0)
@@ -31,7 +31,7 @@ int StartWinsock()
 
 }
 
-int StopWinsock()
+int stopWinsock()
 {
     if(WSACleanup() != 0)
     {
@@ -46,7 +46,7 @@ int StopWinsock()
 
 static DWORD bufferLen = 256;
 static _TCHAR friendlyBuffer[256];
-_TCHAR * FriendlyErrorMessage(DWORD errorCode) {
+_TCHAR * friendlyErrorMessage(DWORD errorCode) {
     memset(friendlyBuffer, 0, sizeof friendlyBuffer);
 
     int written = _sntprintf(friendlyBuffer, bufferLen, _T("%ld : "), errorCode);
@@ -68,7 +68,7 @@ _TCHAR * FriendlyErrorMessage(DWORD errorCode) {
     return friendlyBuffer;
 }
 
-void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort)
+void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort)
 {
     struct sockaddr_in server;
     WSAEVENT listenSocketEvent;
@@ -87,8 +87,8 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort
 
     if(nRet == SOCKET_ERROR) {
 
-        _tprintf(_T("Could not put socket in non blocking mode: %"W"s") , FriendlyErrorMessage(
-                WSAGetLastError())
+        _tprintf(_T("Could not put socket in non blocking mode: %"W"s") , friendlyErrorMessage(
+                         WSAGetLastError())
                 );
         goto cleanup;
 
@@ -134,7 +134,7 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort
             if(WSAGetLastError() == WSAEWOULDBLOCK) {
                 continue;
             }
-            _tprintf(_T("Connection invalide %"W"s\n"), FriendlyErrorMessage(
+            _tprintf(_T("Connection invalide %"W"s\n"), friendlyErrorMessage(
                     WSAGetLastError()));
             goto cleanup;
         }
@@ -152,7 +152,7 @@ void StartServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort
 cleanup:return;
 }
 
-void CloseServer(const SOCKET *s)
+void closeServer(const SOCKET *s)
 {
     while (client_sockets_i--) {
         closesocket(client_sockets[client_sockets_i + 1]);
@@ -166,7 +166,7 @@ void CloseServer(const SOCKET *s)
 
 
 
-_Bool ShutdownConnection(SOCKET sd)
+_Bool shutdownConnection(SOCKET sd)
 {
     // Disallow any further data sends.  This will tell the other side
     // that we want to go away now.  If we skip this step, we don't

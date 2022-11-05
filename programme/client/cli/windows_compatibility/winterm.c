@@ -14,7 +14,7 @@ const int wide = 1;
 const int wide = 0;
 #endif
 
-_Bool EnableVTMode()
+_Bool enableVtMode()
 {
     // Set output mode to handle virtual terminal sequences
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -37,7 +37,7 @@ _Bool EnableVTMode()
     return 1;
 }
 
-int SetupConsoleForUnicode() {
+int setupConsoleForUnicode() {
     int result = -1;
 #ifndef _UNICODE
     return result;
@@ -52,7 +52,7 @@ int SetupConsoleForUnicode() {
     return result;
 }
 
-void LoadCharmap()
+void loadCharmap()
 {
     char line[256] = {0};
 

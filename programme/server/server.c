@@ -24,22 +24,23 @@
 extern const int wide;
 extern int charmap[0xff];
 
-bool ConnectionClient(SOCKET sd);
+bool connectionClient(SOCKET sd);
 static void startMap(board * board);
-DWORD WINAPI ThreadClient(LPVOID sd_);
-DWORD WINAPI ThreadServeur(LPVOID sd_);
+DWORD WINAPI threadClient(LPVOID sd_);
+DWORD WINAPI threadServeur(LPVOID sd_);
 
 void intHandler(int dummy);
 static int showAvailableMaps(char * folder);
 
-int serverThreadIdx = 0;
-HANDLE serverThreads[20];
 
 HANDLE consoleWriteMutex;
 
 
 int main()
 {
+    int serverThreadIdx = 0;
+    HANDLE serverThreads[20];
+
     /* On devrait faire closesocket(sock); puis WSACleanup(); mais puisqu'on a entré une boucle infinie ... */
 
     errno = 0;
@@ -48,14 +49,15 @@ int main()
         perror(strerror(errno));
     }
 
-    HANDLE thr;
 #ifdef _WIN32
-    SetupConsoleForUnicode();
-    LoadCharmap();
+    setupConsoleForUnicode();
+    loadCharmap();
 #endif
     consoleWriteEvent = CreateEvent(
             NULL, TRUE, FALSE, TEXT("WaitConsole")
     );
+
+    startWinsock();
 
     do {
     _putts(_T("1. Voir les parties en cours."));
@@ -71,26 +73,15 @@ int main()
         default: {
             DWORD nThreadId;
 
-            thr = CreateThread(
+            HANDLE thr = CreateThread(
                     NULL, 0,
-                    ThreadServeur, NULL, 0, &nThreadId);
+                    threadServeur, NULL, 0, &nThreadId);
             if (thr == NULL) {
                 _tprintf(_T("failed to create server thread: %d"), GetLastError());
             }
             serverThreads[serverThreadIdx++] = thr;
             _tprintf(_T("Thread serveur crée: thid %d\n"), nThreadId);
             fflush(stdout);
-
-//            consoleWriteMutex = CreateMutex(
-//                    NULL, FALSE, _T("Local\\ConsoleWriteMutex")
-//            );
-
-
-//            if(consoleWriteMutex == NULL) {
-//                _tprintf(_T("Error creating mutex %"W"s"), FriendlyErrorMessage(GetLastError()));
-//            }
-//            ReleaseMutex(consoleWriteMutex);
-//            Sleep(200);
 
             ResetEvent(consoleWriteEvent);
             DWORD wait = WaitForSingleObject(consoleWriteEvent, INFINITE);
@@ -109,7 +100,7 @@ int main()
                 }
                 default:
                 case WAIT_FAILED: {
-                    _tprintf(_T("Thread failed %"W"s\n"), FriendlyErrorMessage(GetLastError()));
+                    _tprintf(_T("Thread failed %"W"s\n"), friendlyErrorMessage(GetLastError()));
                 }
             }
             break;
@@ -122,9 +113,12 @@ int main()
 
     shutdownAsked = 1;
 
-    CloseHandle(thr);
+    for (int i = 0; i < serverThreadIdx; i++) {
+        CloseHandle(serverThreads[i]);
+    }
     CloseHandle(consoleWriteMutex);
     CloseHandle(consoleWriteEvent);
+    stopWinsock();
 
     return 0;
 }
@@ -137,16 +131,14 @@ static void startMap(board * board)
     _putts(buf);
     fflush(stdout);
 
-    StartWinsock();
     SOCKET s;
     fflush(stdout);
 
-    StartServer(&s, (LPTHREAD_START_ROUTINE) ThreadClient, 41480);
-    CloseServer(&s);
-    StopWinsock();
+    startServer(&s, (LPTHREAD_START_ROUTINE) threadClient, 41480);
+    closeServer(&s);
 }
 
-DWORD WINAPI ThreadServeur(LPVOID sd_)
+DWORD WINAPI threadServeur(LPVOID sd_)
 {
     int retVal = 0;
 
@@ -166,7 +158,7 @@ DWORD WINAPI ThreadServeur(LPVOID sd_)
 }
 
 
-bool ConnectionClient(SOCKET sd) {
+bool connectionClient(SOCKET sd) {
     // Read data from client
     char acReadBuffer[K_BUFFER_SIZE];
     int nReadBytes;
@@ -204,17 +196,17 @@ bool ConnectionClient(SOCKET sd) {
 }
 
 
-DWORD WINAPI ThreadClient(LPVOID sd_) {
+DWORD WINAPI threadClient(LPVOID sd_) {
     int nRetval = 0;
     SOCKET sd = (SOCKET)sd_;
 
-    if (!ConnectionClient(sd)) {
+    if (!connectionClient(sd)) {
         printf("Erreur avec le client\n");
         nRetval = 3;
     }
 
     puts("Fermeture connection avec client...");
-    if (ShutdownConnection(sd)) {
+    if (shutdownConnection(sd)) {
         printf("Connection is down.");
     }
     else {
@@ -248,8 +240,10 @@ static int showAvailableMaps(char * folder) {
         _TCHAR bufOut[0x100] = {0};
         mapView(0x100, bufOut, &board);
        // _putts(buf);
+        wchar_t longName[MAX_PATH] = {0};
+        mbtowc(longName, desc->d_name, desc->d_namlen);
 
-        _tprintf(_T("%d. %s\n%"W"s"), ret+1, desc->d_name, bufOut);
+        _tprintf(_T("%d. %"W"s\n%"W"s"), ret+1, longName, bufOut);
         ret++;
     }
 
@@ -262,5 +256,4 @@ static int showAvailableMaps(char * folder) {
 void intHandler(int val) {
     _tprintf(_T("sigint recu %d"), val);
     fflush(stdout);
-    return;
 }

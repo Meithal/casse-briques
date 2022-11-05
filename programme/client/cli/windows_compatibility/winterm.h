@@ -12,13 +12,13 @@
 #include <tchar.h>
 
 
-_Bool EnableVTMode();
-int SetupConsoleForUnicode();
+_Bool enableVtMode();
+int setupConsoleForUnicode();
 
 //int charmap[0xff];
 //const int wide;
 
-void LoadCharmap();
+void loadCharmap();
 #ifdef _UNICODE
 #define W "l"
 #else

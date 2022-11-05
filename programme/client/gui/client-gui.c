@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
     writeFreetype("casses briques", freetypeWrapper.ftFaces[0], 50, 50, sdlWindow);
 
-    StartWinsock();
+    startWinsock();
 
     SDL_bool continuer = SDL_TRUE;
 
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     }
     SDL_Quit();
 
-    StopWinsock();
+    stopWinsock();
 
     return 0;
 }
