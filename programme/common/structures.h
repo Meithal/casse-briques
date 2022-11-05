@@ -36,6 +36,12 @@ struct board {
     struct player (* players)[];
 };
 
+typedef struct clientPlayer clientPlayer;
+struct clientPlayer {
+    struct player * player;
+    SOCKET connection;
+};
+
 typedef struct hosted_game hosted_game;
 struct hosted_game {
     board *board;
@@ -43,7 +49,7 @@ struct hosted_game {
     int serverPort;
     SOCKET serverSocket;
     int nbClients;
-    SOCKET clientSockets[];
+    clientPlayer clientPlayers[];
 };
 
 extern field vide;

@@ -117,7 +117,22 @@ int setAIPlayers(int number, board * board)
     return 1;
 }
 
-int getPlacesRestantes(board * board)
+int getPlacesRestantes(hosted_game * hostedGame)
 {
-    return 1;
+    int restant = 0;
+    board * board = hostedGame->board;
+    int max = board->nb_players;
+
+    restant = max;
+
+    for(int i = 0; i < max ; i++) {
+        player player = (*board->players)[i];
+        if(player.is_ia) {
+            restant--;
+        }
+    }
+
+    restant -= hostedGame->nbClients;
+
+    return restant;
 }

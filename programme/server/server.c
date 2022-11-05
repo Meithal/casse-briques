@@ -73,7 +73,7 @@ int main()
 
                 _tprintf(_T("%d. \033[33mPlaces restantes : %d\033[0m\n%"W"s"),
                     i+1,
-                    getPlacesRestantes(hostedGames[i].board),
+                    getPlacesRestantes(&hostedGames[i]),
                     bufOut
                 );
             }
