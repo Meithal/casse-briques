@@ -21,15 +21,14 @@
 #include "common/game_rules/gameRules.h"
 #include "client/cli/askIntInput.h"
 
-extern const int wide;
-extern int charmap[0xff];
 
-bool connectionClient(SOCKET sd);
+
+
 static void startMap(board * board);
 DWORD WINAPI threadClient(LPVOID sd_);
 DWORD WINAPI threadServeur(LPVOID sd_);
 
-void intHandler(int dummy);
+void intHandler(int val);
 static int showAvailableMaps(char * folder);
 
 
@@ -134,7 +133,7 @@ static void startMap(board * board)
     SOCKET s;
     fflush(stdout);
 
-    startServer(&s, (LPTHREAD_START_ROUTINE) threadClient, 41480);
+    startServer(&s, (LPTHREAD_START_ROUTINE) threadClient, &board->serverPort);
     closeServer(&s);
 }
 
@@ -151,66 +150,28 @@ DWORD WINAPI threadServeur(LPVOID sd_)
     loadMap(buf, &board);
     int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board.nb_players);
     setAIPlayers(ias, &board);
+    board.serverPort = 41480;
 
     startMap(&board);
 
     return retVal;
 }
 
-
-bool connectionClient(SOCKET sd) {
-    // Read data from client
-    char acReadBuffer[K_BUFFER_SIZE];
-    int nReadBytes;
-    do {
-        nReadBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
-        if (nReadBytes > 0) {
-            _tprintf(_T("Received %d bytes from client.\n"), nReadBytes);
-
-            int nSentBytes = 0;
-            while (nSentBytes < nReadBytes) {
-                int nTemp = send(sd, acReadBuffer + nSentBytes,
-                                 nReadBytes - nSentBytes, 0);
-                if (nTemp > 0) {
-                    _tprintf(_T("Sent %d bytes back to client.\n"), nTemp);
-                    nSentBytes += nTemp;
-                }
-                else if (nTemp == SOCKET_ERROR) {
-                    return false;
-                }
-                else {
-                    // Client closed connection before we could reply to
-                    // all the data it sent, so bomb out early.
-                    _putts(_T("Peer unexpectedly dropped connection!"));
-                    return true;
-                }
-            }
-        }
-        else if (nReadBytes == SOCKET_ERROR) {
-            return false;
-        }
-    } while (nReadBytes != 0);
-
-    _putts(_T("Connection closed by peer."));
-    return true;
-}
-
-
 DWORD WINAPI threadClient(LPVOID sd_) {
     int nRetval = 0;
     SOCKET sd = (SOCKET)sd_;
 
     if (!connectionClient(sd)) {
-        printf("Erreur avec le client\n");
+        _putts(_T("Erreur avec le client"));
         nRetval = 3;
     }
 
-    puts("Fermeture connection avec client...");
+    _putts(_T("Fermeture connection avec client..."));
     if (shutdownConnection(sd)) {
-        printf("Connection is down.");
+        _tprintf(_T("Connection is down."));
     }
     else {
-        fprintf(stderr, "Connection shutdown failed\n");
+        _ftprintf(stderr, _T("Connection shutdown failed\n"));
         nRetval = 3;
     }
 

@@ -32,6 +32,7 @@ struct board {
     struct tile (* board)[];
     int nb_players;
     struct player (* players)[];
+    int serverPort;
 };
 
 extern field vide;

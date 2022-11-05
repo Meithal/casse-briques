@@ -68,7 +68,7 @@ _TCHAR * friendlyErrorMessage(DWORD errorCode) {
     return friendlyBuffer;
 }
 
-void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort)
+void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int * serverPort)
 {
     struct sockaddr_in server;
     WSAEVENT listenSocketEvent;
@@ -96,14 +96,21 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE ThreadClient, int serverPort
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( serverPort );
+    do {
+        server.sin_port = htons(*serverPort);
 
-    //Bind
-    if( bind(*s ,(struct sockaddr *)&server , sizeof(server)) == SOCKET_ERROR)
-    {
-        _tprintf(_T("Bind failed with error code : %d") , WSAGetLastError());
-        goto cleanup;
-    }
+        //Bind
+        if (bind(*s, (struct sockaddr *) &server, sizeof(server)) == SOCKET_ERROR) {
+            if(WSAGetLastError() == 10048) {// protocol/adress/port already in use
+                (*serverPort)++;
+                _tprintf(_T("Port already used, trying with : %d\n"), *serverPort);
+
+                continue;
+            }
+            _tprintf(_T("Bind failed with error code : %"W"s"), friendlyErrorMessage(WSAGetLastError()));
+            goto cleanup;
+        } else break;
+    } while (1);
 
     _putts(_T("Bind done."));
 
@@ -200,5 +207,42 @@ _Bool shutdownConnection(SOCKET sd)
         return 0;
     }
 
+    return 1;
+}
+
+_Bool connectionClient(SOCKET sd) {
+    // Read data from client
+    char acReadBuffer[K_BUFFER_SIZE];
+    int nReadBytes;
+    do {
+        nReadBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
+        if (nReadBytes > 0) {
+            _tprintf(_T("Received %d bytes from client.\n"), nReadBytes);
+
+            int nSentBytes = 0;
+            while (nSentBytes < nReadBytes) {
+                int nTemp = send(sd, acReadBuffer + nSentBytes,
+                                 nReadBytes - nSentBytes, 0);
+                if (nTemp > 0) {
+                    _tprintf(_T("Sent %d bytes back to client.\n"), nTemp);
+                    nSentBytes += nTemp;
+                }
+                else if (nTemp == SOCKET_ERROR) {
+                    return 0;
+                }
+                else {
+                    // Client closed connection before we could reply to
+                    // all the data it sent, so bomb out early.
+                    _putts(_T("Peer unexpectedly dropped connection!"));
+                    return 1;
+                }
+            }
+        }
+        else if (nReadBytes == SOCKET_ERROR) {
+            return 0;
+        }
+    } while (nReadBytes != 0);
+
+    _putts(_T("Connection closed by peer."));
     return 1;
 }
