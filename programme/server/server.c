@@ -21,7 +21,7 @@
 
 static void startMap(board * board);
 DWORD WINAPI threadClient(LPVOID sd_);
-DWORD WINAPI threadServeur(LPVOID board);
+DWORD WINAPI threadServeur(LPVOID phosted_game);
 
 void intHandler(int val);
 static int showAvailableMaps(char * folder);
@@ -33,6 +33,8 @@ int main()
     int serverThreadIdx = 0;
     HANDLE serverThreads[20];
 
+    int hostedGamesIdx = 0;
+    hosted_game hostedGames[20];
     int boardsIdx = 0;
     board boards[20];
 
@@ -45,6 +47,7 @@ int main()
     }
 
 #ifdef _WIN32
+    enableVtMode();
     setupConsoleForUnicode();
     loadCharmap();
 #endif
@@ -64,11 +67,15 @@ int main()
     switch (input) {
         case 1: {
             _putts(_T("Parties en cours :"));
-            for (int i = 0; i < boardsIdx; ++i) {
+            for (int i = 0; i < hostedGamesIdx; ++i) {
                 _TCHAR bufOut[0x100] = {0};
-                mapView(0x100, bufOut, &boards[i]);
+                mapView(0x100, bufOut, hostedGames[i].board);
 
-                _tprintf(_T("%d.\n%"W"s"), i+1, bufOut);
+                _tprintf(_T("%d. \033[33mPlaces restantes : %d\033[0m\n%"W"s"),
+                    i+1,
+                    getPlacesRestantes(hostedGames[i].board),
+                    bufOut
+                );
             }
 
             break;
@@ -76,11 +83,13 @@ int main()
         case 2:
         default: {
             DWORD nThreadId;
+
             boards[boardsIdx++] = (board) {};
+            hostedGames[hostedGamesIdx++] = (hosted_game) {.board = &boards[boardsIdx-1]};
 
             HANDLE thr = CreateThread(
                     NULL, 0,
-                    threadServeur, &boards[boardsIdx-1], 0, &nThreadId);
+                    threadServeur, &hostedGames[hostedGamesIdx-1], 0, &nThreadId);
             if (thr == NULL) {
                 _tprintf(_T("failed to create server thread: %d"), GetLastError());
             }
@@ -128,25 +137,11 @@ int main()
     return 0;
 }
 
-
-static void startMap(board * board)
-{
-    _TCHAR buf[0x100] = {0};
-    mapView(0x100, buf, board);
-    _putts(buf);
-    fflush(stdout);
-
-    SOCKET s;
-    fflush(stdout);
-
-    startServer(&s, (LPTHREAD_START_ROUTINE) threadClient, &board->serverPort);
-    closeServer(&s);
-}
-
-DWORD WINAPI threadServeur(LPVOID pboard)
+DWORD WINAPI threadServeur(LPVOID phosted_game)
 {
     int retVal = 0;
-    struct board * board = pboard;
+    hosted_game * hostedGame = phosted_game;
+    struct board * board = hostedGame->board;
 
     int mapsNumber = showAvailableMaps("assets/maps");
     int map = askIntInput(_T("Quelle carte ?"), 1, mapsNumber);
@@ -156,10 +151,12 @@ DWORD WINAPI threadServeur(LPVOID pboard)
     loadMap(buf, board);
     int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board->nb_players);
     setAIPlayers(ias, board);
-    board->serverPort = 41480;
-    board->mapNumber = map;
+    hostedGame->serverPort = 41480;
+    hostedGame->mapNumber = map;
 
-    startMap(board);
+    SOCKET s;
+    startServer(&s, (LPTHREAD_START_ROUTINE) threadClient, &hostedGame->serverPort);
+    closeServer(&s);
 
     return retVal;
 }

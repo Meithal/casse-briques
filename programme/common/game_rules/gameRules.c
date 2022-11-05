@@ -113,4 +113,11 @@ int setAIPlayers(int number, board * board)
     while(number--) {
         (*board->players)[number].is_ia = 1;
     }
+
+    return 1;
+}
+
+int getPlacesRestantes(board * board)
+{
+    return 1;
 }

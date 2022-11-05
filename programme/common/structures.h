@@ -5,6 +5,8 @@
 #ifndef CASES_BRIQUES_STRUCTURES_H
 #define CASES_BRIQUES_STRUCTURES_H
 
+#include "winsock2.h"
+
 typedef struct field field;
 struct field {
     int visual;
@@ -32,8 +34,16 @@ struct board {
     struct tile (* board)[];
     int nb_players;
     struct player (* players)[];
+};
+
+typedef struct hosted_game hosted_game;
+struct hosted_game {
+    board *board;
     int mapNumber;
     int serverPort;
+    SOCKET serverSocket;
+    int nbClients;
+    SOCKET clientSockets[];
 };
 
 extern field vide;
