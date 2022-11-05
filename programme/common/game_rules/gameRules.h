@@ -13,7 +13,7 @@ int loadMap(char* path, board * board);
 void unloadMap(board * board);
 int setAIPlayers(int number, board * board);
 int getPlacesRestantes(hosted_game * hostedGame);
-hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[hostedGamesMax], int idx);
+hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[], int idx);
 player * playerAtPosition(board*board, int y, int x);
 
 extern int charmap[0xff];

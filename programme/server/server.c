@@ -112,7 +112,7 @@ int main()
         default: {
             DWORD nThreadId;
 
-            boards[boardsIdx++] = (board) {};
+            boards[boardsIdx++] = (board) {0};
             hostedGames[hostedGamesIdx++] = (hosted_game) {.board = &boards[boardsIdx-1]};
 
             HANDLE thr = CreateThread(
