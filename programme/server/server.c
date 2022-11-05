@@ -5,7 +5,6 @@
 #include "stdio.h"
 
 #include "signal.h"
-#include <stdbool.h>
 
 #include <winsock2.h>
 #include "dirent.h"
@@ -17,28 +16,25 @@
 #include "client/cli/windows_compatibility/winterm.h"
 #endif
 
-#include "server.h"
 #include "common/game_rules/gameRules.h"
 #include "client/cli/askIntInput.h"
 
-
-
-
 static void startMap(board * board);
 DWORD WINAPI threadClient(LPVOID sd_);
-DWORD WINAPI threadServeur(LPVOID sd_);
+DWORD WINAPI threadServeur(LPVOID board);
 
 void intHandler(int val);
 static int showAvailableMaps(char * folder);
 
-
 HANDLE consoleWriteMutex;
-
 
 int main()
 {
     int serverThreadIdx = 0;
     HANDLE serverThreads[20];
+
+    int boardsIdx = 0;
+    board boards[20];
 
     /* On devrait faire closesocket(sock); puis WSACleanup(); mais puisqu'on a entré une boucle infinie ... */
 
@@ -66,15 +62,25 @@ int main()
     int input = askIntInput(NULL, 1, 3);
 
     switch (input) {
-        case 1:
-            // todo
+        case 1: {
+            _putts(_T("Parties en cours :"));
+            for (int i = 0; i < boardsIdx; ++i) {
+                _TCHAR bufOut[0x100] = {0};
+                mapView(0x100, bufOut, &boards[i]);
+
+                _tprintf(_T("%d.\n%"W"s"), i+1, bufOut);
+            }
+
+            break;
+        }
         case 2:
         default: {
             DWORD nThreadId;
+            boards[boardsIdx++] = (board) {};
 
             HANDLE thr = CreateThread(
                     NULL, 0,
-                    threadServeur, NULL, 0, &nThreadId);
+                    threadServeur, &boards[boardsIdx-1], 0, &nThreadId);
             if (thr == NULL) {
                 _tprintf(_T("failed to create server thread: %d"), GetLastError());
             }
@@ -137,22 +143,22 @@ static void startMap(board * board)
     closeServer(&s);
 }
 
-DWORD WINAPI threadServeur(LPVOID sd_)
+DWORD WINAPI threadServeur(LPVOID pboard)
 {
     int retVal = 0;
+    struct board * board = pboard;
 
     int mapsNumber = showAvailableMaps("assets/maps");
     int map = askIntInput(_T("Quelle carte ?"), 1, mapsNumber);
 
     char buf[256];
     sprintf(buf, "assets/maps/grille%d.txt", map);
-    board board;
-    loadMap(buf, &board);
-    int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board.nb_players);
-    setAIPlayers(ias, &board);
-    board.serverPort = 41480;
+    loadMap(buf, board);
+    int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board->nb_players);
+    setAIPlayers(ias, board);
+    board->serverPort = 41480;
 
-    startMap(&board);
+    startMap(board);
 
     return retVal;
 }
