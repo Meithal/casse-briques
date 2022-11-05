@@ -17,9 +17,13 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
 
     _tprintf(_T("\033[2J"));
 
+    startClient();
+
     while (1) {
         Sleep(200);
         _tprintf(_T("\033[H"));
+
+        //updateGameFromServer(hostedGame);
 
         _TCHAR bufOut[0x100] = {0};
         mapView(0x100, bufOut, hostedGame->board, afficheJoueurs);
@@ -34,6 +38,8 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
             _tprintf(_T("%d"), ch);
         }
     }
+
+    closeClient(hostedGame->clientData.clientSocket);
 
     _putts(_T(""));
     SetEvent(consoleWriteEvent);

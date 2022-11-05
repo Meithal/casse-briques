@@ -16,9 +16,6 @@
 #include "client/cli/windows_compatibility/winterm.h"
 #endif
 
-extern int charmap[0xff];
-extern const int wide;
-
 
 int main () {
 #ifdef _WIN32

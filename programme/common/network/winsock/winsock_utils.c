@@ -226,18 +226,8 @@ void startClient(char* address, int port)
 
     _tprintf(_T("Bytes Sent: %ld\n"), iResult);
 
-    // shutdown the connection since no more data will be sent
-    iResult = shutdown(ConnectSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        _tprintf(_T("shutdown failed with error: %d\n"), WSAGetLastError());
-        closesocket(ConnectSocket);
-
-        return;
-    }
-
     // Receive until the peer closes the connection
     do {
-
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if ( iResult > 0 )
             _tprintf(_T("Bytes received: %d\n"), iResult);
@@ -248,8 +238,22 @@ void startClient(char* address, int port)
 
     } while( iResult > 0 );
 
+}
+
+void closeClient(const SOCKET s)
+{
+    // shutdown the connection since no more data will be sent
+    int iResult = shutdown(s, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        _tprintf(_T("shutdown failed with error: %d\n"), WSAGetLastError());
+        closesocket(s);
+
+        return;
+    }
+
     // cleanup
-    closesocket(ConnectSocket);
+    closesocket(s);
+
 }
 
 
