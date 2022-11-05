@@ -23,7 +23,10 @@ add_executable(casses_briques-cli
         programme/common/game_rules/gameRules.h
         programme/client/cli/askIntInput.c
         programme/client/cli/askIntInput.h
-        programme/client/cli/grilleDisplay.c programme/client/cli/grilleDisplay.h programme/client/cli/client.c programme/client/cli/client.h)
+        programme/client/cli/grilleDisplay.c
+        programme/client/cli/grilleDisplay.h
+        programme/client/cli/client.c
+        programme/client/cli/client.h)
 target_include_directories(casses_briques-cli PRIVATE programme)
 
 add_executable(casses_briques-server
@@ -33,7 +36,10 @@ add_executable(casses_briques-server
         programme/common/game_rules/gameRules.h
         programme/client/cli/askIntInput.c
         programme/client/cli/askIntInput.h
-        programme/client/cli/grilleDisplay.c programme/client/cli/grilleDisplay.h programme/client/cli/client.c programme/client/cli/client.h)
+        programme/client/cli/grilleDisplay.c
+        programme/client/cli/grilleDisplay.h
+        programme/client/cli/client.c
+        programme/client/cli/client.h)
 target_include_directories(casses_briques-server PRIVATE programme)
 
 if(UNIX)
@@ -131,3 +137,8 @@ set(FT_DISABLE_BROTLI TRUE)
 add_subdirectory(vendor/freetype)
 
 target_link_libraries(casses_briques-gui PRIVATE freetype)
+
+add_subdirectory(vendor/json)
+target_link_libraries(casses_briques-server PUBLIC sjson)
+target_link_libraries(casses_briques-cli PUBLIC sjson)
+target_link_libraries(casses_briques-gui PUBLIC sjson)

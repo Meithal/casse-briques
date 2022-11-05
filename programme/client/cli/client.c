@@ -2,6 +2,7 @@
 // Created by hurin on 05/11/2022.
 //
 
+#include "json.h"
 #include "client.h"
 
 
@@ -17,7 +18,7 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
 
     _tprintf(_T("\033[2J"));
 
-    startClient();
+    //startClient();
 
     while (1) {
         Sleep(200);

@@ -9,6 +9,7 @@
 #include <winsock2.h>
 #include "dirent.h"
 #include "conio.h"
+#include "json.h"
 
 #include "common/network/winsock/winsock_utils.h"
 
