@@ -157,6 +157,7 @@ DWORD WINAPI threadServeur(LPVOID pboard)
     int ias = askIntInput(_T("Combien de IA vont jouer dans la map ?"), 0, board->nb_players);
     setAIPlayers(ias, board);
     board->serverPort = 41480;
+    board->mapNumber = map;
 
     startMap(board);
 

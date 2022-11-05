@@ -32,6 +32,7 @@ struct board {
     struct tile (* board)[];
     int nb_players;
     struct player (* players)[];
+    int mapNumber;
     int serverPort;
 };
 
