@@ -20,7 +20,7 @@
 #include "client/cli/askIntInput.h"
 
 static void startMap(board * board);
-DWORD WINAPI threadClient(LPVOID sd_);
+DWORD WINAPI threadServerListenClient(LPVOID sd_);
 DWORD WINAPI threadServeur(LPVOID phosted_game);
 
 void intHandler(int val);
@@ -78,6 +78,24 @@ int main()
                 );
             }
 
+            _putts(_T("Quelle partie rejoindre ?"));
+
+            int found = 0;
+            for (int i = 0; i < hostedGamesIdx; ++i) {
+                if(!getPlacesRestantes(&hostedGames[i])) {
+                    continue;
+                }
+                _tprintf(_T("%d. Joindre la partie %d\n"), found+1, i+1);
+                found++;
+            }
+            _tprintf(_T("%d. Revenir à l'accueil\n"), found+1);
+
+            input = askIntInput(NULL, 1, found+1);
+            if(input == found+1) {
+                break;
+            } else {
+
+            }
             break;
         }
         case 2:
@@ -155,13 +173,13 @@ DWORD WINAPI threadServeur(LPVOID phosted_game)
     hostedGame->mapNumber = map;
 
     SOCKET s;
-    startServer(&s, (LPTHREAD_START_ROUTINE) threadClient, &hostedGame->serverPort);
+    startServer(&s, (LPTHREAD_START_ROUTINE) threadServerListenClient, &hostedGame->serverPort);
     closeServer(&s);
 
     return retVal;
 }
 
-DWORD WINAPI threadClient(LPVOID sd_) {
+DWORD WINAPI threadServerListenClient(LPVOID sd_) {
     int nRetval = 0;
     SOCKET sd = (SOCKET)sd_;
 
@@ -181,6 +199,7 @@ DWORD WINAPI threadClient(LPVOID sd_) {
 
     return nRetval;
 }
+
 
 static int showAvailableMaps(char * folder) {
 
