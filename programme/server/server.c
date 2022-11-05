@@ -8,6 +8,7 @@
 
 #include <winsock2.h>
 #include "dirent.h"
+#include "conio.h"
 
 #include "common/network/winsock/winsock_utils.h"
 
@@ -210,7 +211,21 @@ DWORD WINAPI threadClient(LPVOID phosted_game)
 {
     hosted_game * hostedGame = phosted_game;
     _putts(_T("Bienvenue dans la partie en cours"));
+    _putts(_T("Appuyez sur les flèches pour vous déplacer, q pour quitter."));
 
+    while(1) {
+        if(kbhit()) {
+            int ch = getch();
+
+            if(ch == 'q') {
+                break;
+            }
+            _tprintf(_T("%d"), ch);
+        }
+    }
+
+    _putts(_T(""));
+    SetEvent(consoleWriteEvent);
     return 0;
 }
 
