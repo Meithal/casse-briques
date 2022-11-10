@@ -266,7 +266,7 @@ static int showAvailableMaps(char * folder) {
         mapView(0x100, bufOut, &board, NULL);
        // _putts(buf);
         wchar_t longName[MAX_PATH] = {0};
-        mbtowc(longName, desc->d_name, desc->d_namlen);
+        mbstowcs(longName, desc->d_name, desc->d_namlen);
 
         _tprintf(_T("%d. %"W"s\n%"W"s"), ret+1, longName, bufOut);
         ret++;

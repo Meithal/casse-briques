@@ -136,9 +136,12 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
             _tprintf(_T("%d\n"), ch);
         }
         _putts(_T("Messages du serveur"));
-        mbtowc(wOutBuf, outBuf, strlen(outBuf));
+#ifdef _UNICODE
+        mbstowcs(wOutBuf, outBuf, strlen(outBuf)+1);
+        _tprintf(_T("%s\n"), wOutBuf);
+#else
         _tprintf(_T("%10s\n"), outBuf);
-
+#endif
     }
 
     closeClient(hostedGame->clientData.clientSocket);
