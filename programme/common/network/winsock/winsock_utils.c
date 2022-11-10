@@ -145,15 +145,23 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE threadServerListenClient, in
             goto cleanup;
         }
 
+        TCHAR outBuf[40] = {0};
+        InetNtop(AF_INET, &sinRemote.sin_addr, outBuf, 40);
 
-        _tprintf(_T("Connection depuis %s, %d"),
-               inet_ntoa(sinRemote.sin_addr),
+        _tprintf(_T("Connection depuis %s, %d\n"),
+               outBuf,
                ntohs(sinRemote.sin_port));
 
         DWORD nThreadId;
 
-
-        CreateThread(0, 0, threadServerListenClient, (void *) sd, 0, &nThreadId);
+        CreateThread(
+            0,
+            0,
+            threadServerListenClient,
+            (void *) sd,
+            0,
+            &nThreadId
+        );
     }
 
 cleanup:return;
@@ -313,6 +321,9 @@ _Bool connectionClient(SOCKET sd) {
             }
         }
         else if (nReadBytes == SOCKET_ERROR) {
+            if(WSAGetLastError() == WSAEWOULDBLOCK) {
+                continue;
+            }
             return 0;
         }
     } while (nReadBytes != 0);

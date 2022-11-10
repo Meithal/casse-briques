@@ -226,7 +226,7 @@ DWORD WINAPI threadServerListenClient(LPVOID sd_) {
     onConnectCallback(sd);
 
     if (!connectionClient(sd)) {
-        _putts(_T("Erreur avec le client"));
+        _tprintf(_T("Erreur avec le client %"W"s\n"), friendlyErrorMessage(WSAGetLastError()));
         nRetval = 3;
     }
 
