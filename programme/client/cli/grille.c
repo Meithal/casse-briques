@@ -161,7 +161,6 @@ int main () {
 
 
             fseek(f, -(column*row+row*2), SEEK_END);
-            vider_tampon(stdin);
             lettre = fgetc(f);
             position = 1;
             while (lettre!=EOF) {
@@ -169,7 +168,7 @@ int main () {
                     if ((lettre!=vide.txt && lettre!='p') || playerOne.position==playerTwo.position) {
                         playerOne.position = positionSave;
                     }
-                    wprintf(L"%lc", playerOne.visual);
+                    _tprintf(_T("%lc"), playerOne.visual);
                     position++;
                 } else if (position==playerTwo.position) {
                     if ((lettre!=vide.txt && lettre!='p') || playerTwo.position==playerOne.position) {
@@ -192,7 +191,6 @@ int main () {
                 } else {
                     _tprintf(_T("\n"));
                 }
-                vider_tampon(stdin);
                 lettre = fgetc(f);
             }
 
