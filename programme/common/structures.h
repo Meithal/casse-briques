@@ -25,6 +25,8 @@ struct player {
     int line;
     int col;
     int is_ia;
+    int visual; // utilise pour le code client
+    int position; // utilise pour le code client
 };
 
 typedef struct board board;
