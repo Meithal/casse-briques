@@ -161,6 +161,7 @@ int main () {
 
 
             fseek(f, -(column*row+row*2), SEEK_END);
+            vider_tampon(stdin);
             lettre = fgetc(f);
             position = 1;
             while (lettre!=EOF) {
@@ -191,6 +192,7 @@ int main () {
                 } else {
                     _tprintf(_T("\n"));
                 }
+                vider_tampon(stdin);
                 lettre = fgetc(f);
             }
 
