@@ -97,16 +97,16 @@ int main () {
                 position++;
                 if (numberPlayer==1) {
                     playerOne.position = position;
-                    wprintf(L"%lc", playerOne.visual);
+                    _tprintf(_T("%"W"c"), playerOne.visual);
                 } else if (numberPlayer==2) {
                     playerTwo.position = position;
-                    wprintf(L"%lc", playerTwo.visual);
+                    _tprintf(_T("%"W"c"), playerTwo.visual);
                 } else if (numberPlayer==3) {
                     playerThree.position = position;
-                    wprintf(L"%lc", playerThree.visual);
+                    _tprintf(_T("%"W"c"), playerThree.visual);
                 } else if (numberPlayer==4) {
                     playerFour.position = position;
-                    wprintf(L"%lc", playerFour.visual);
+                    _tprintf(_T("%"W"c"), playerFour.visual);
                 }
                 numberPlayer++;
             } else {
@@ -166,19 +166,19 @@ int main () {
                     if ((lettre!=vide.txt && lettre!='p') || playerTwo.position==playerOne.position) {
                         playerTwo.position = positionSave;
                     }
-                    wprintf(L"%lc", playerTwo.visual);
+                    _tprintf(_T("%"W"c"), playerTwo.visual);
                     position++;
                 } else if (lettre==mur.txt && position!=playerOne.position) {
-                    wprintf(L"%lc", mur.visual);
+                    _tprintf(_T("%"W"c"), wide ? charmap[mur.visual] : mur.visual);
                     position++;
                 } else if (lettre==bricks.txt && position!=playerOne.position) {
-                    wprintf(L"%lc", bricks.visual);
+                    _tprintf(_T("%"W"c"), wide ? charmap[bricks.visual] : bricks.visual);
                     position++;
                 } else if (lettre==vide.txt && position!=playerOne.position)  {
-                    wprintf(L"%lc", vide.visual);
+                    _tprintf(_T("%"W"c"), wide ? charmap[vide.visual] : vide.visual);
                     position++;
                 } else if (lettre=='p' && position!=playerOne.position) {
-                    wprintf(L"%lc", vide.visual);
+                    _tprintf(_T("%"W"c"), wide ? charmap[vide.visual] : vide.visual);
                     position++;
                 } else {
                     _tprintf(_T("\n"));
