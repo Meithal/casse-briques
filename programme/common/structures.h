@@ -12,6 +12,10 @@ struct field {
     int destructible;
 };
 
-
+typedef struct player player;
+struct player {
+    int visual;
+    int position;
+};
 
 #endif //CASES_BRIQUES_STRUCTURES_H
