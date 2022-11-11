@@ -120,8 +120,8 @@ int main () {
         int turn = 1;
         while (1) {
             _putts(_TEXT("\nAppuyez sur zqsd pour vous déplacer"));
-            vider_tampon(stdin);
             char movement = getchar();
+            vider_tampon(stdin);
 
 
             int positionSave;
