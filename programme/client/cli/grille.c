@@ -11,6 +11,23 @@
 #ifdef _WIN32
 #include "client/cli/windows_compatibility/winterm.h"
 #endif
+
+static int vider_tampon(FILE *fp)
+{
+    /*
+     * Vide les données en attente de lecture du flux spécifié.
+     */
+
+    int c;
+
+    do
+        c = fgetc(fp);
+    while (c != '\n' && c != EOF);
+
+    return ferror(fp) ? 0 : 1;
+}
+
+
 int main () {
     setlocale(LC_CTYPE, "");
     field vide = {
@@ -111,6 +128,7 @@ int main () {
         int turn = 1;
         while (1) {
             _putts(_TEXT("\nAppuyez sur zqsd pour vous déplacer"));
+            vider_tampon(stdin);
             char movement = getchar();
 
 
