@@ -5,6 +5,8 @@
 #ifndef CASES_BRIQUES_STRUCTURES_H
 #define CASES_BRIQUES_STRUCTURES_H
 
+#include "winsock2.h"
+
 typedef struct field field;
 struct field {
     wchar_t visual;
@@ -12,10 +14,59 @@ struct field {
     int destructible;
 };
 
+typedef struct tile tile;
+struct tile {
+    struct field * type;
+    int destroyed;
+};
+
 typedef struct player player;
 struct player {
-    int visual;
-    int position;
+    int line;
+    int col;
+    int is_ia;
+    int visual; // utilise pour le code client
+    int position; // utilise pour le code client
 };
+
+typedef struct board board;
+struct board {
+    int rows;
+    int cols;
+    struct tile (* board)[];
+    int nb_players;
+    struct player (* players)[];
+};
+
+typedef struct clientPlayer clientPlayer;
+struct clientPlayer {
+    struct player * player;
+    SOCKET connection;
+};
+
+typedef struct hosted_game hosted_game;
+struct hosted_game {
+    board *board;
+    int mapNumber;
+    int serverPort;
+    union {
+        struct {
+            SOCKET serverSocket;
+            int nbClients;
+            clientPlayer clientPlayers[];
+        } hostData;
+        struct {
+            SOCKET clientSocket;
+            char * serverMessages;
+        } clientData;
+    };
+};
+
+extern field vide;
+extern field bricks;
+extern field mur;
+
+
+
 
 #endif //CASES_BRIQUES_STRUCTURES_H

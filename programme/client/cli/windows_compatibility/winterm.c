@@ -4,7 +4,14 @@
 
 #include "winterm.h"
 
-_Bool EnableVTMode()
+int charmap[0xff] = {0};
+#ifdef _UNICODE
+const int wide = 1;
+#else
+const int wide = 0;
+#endif
+
+_Bool enableVtMode()
 {
     // Set output mode to handle virtual terminal sequences
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -27,17 +34,47 @@ _Bool EnableVTMode()
     return 1;
 }
 
-int SetupConsoleForUnicode() {
-    int result = 0;
+int setupConsoleForUnicode() {
+    int result = -1;
 #ifndef _UNICODE
     return result;
 #endif
     // Set "stdin" to have wide text mode:
     result = _setmode( _fileno( stdout ), _O_WTEXT );
     if( result == -1 )
-        perror( "Cannot set mode" );
+        _ftprintf(stderr, _T("Cannot set mode" ));
     else
-        printf( "'stdin' successfully changed to binary mode\n" );
+        _tprintf( _T("'stdout' successfully changed to unicode mode\n" ));
 
     return result;
 }
+
+void loadCharmap()
+{
+    char line[256] = {0};
+
+    _putts(_T("loading charmap"));
+    fflush(stdout);
+
+    FILE* f = fopen("assets/CP850.TXT", "r");
+
+    if(f == NULL) {
+        perror(NULL);
+        fflush(stderr);
+        return;
+    }
+
+    int val = 0;
+    int pushed = 0;
+    while (fgets(line, 256, f)) {
+        if(line[0] != '0') {
+            continue;
+        }
+        sscanf(line, "%*x\t%x", &val);
+        charmap[pushed++] = val;
+//        _tprintf(_T("%d\n"), val);
+    }
+
+    fclose(f);
+}
+

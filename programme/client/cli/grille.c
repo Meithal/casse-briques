@@ -3,9 +3,14 @@
 //
 
 #include "stdio.h"
-#include "string.h"
-#include <wchar.h>
 #include <locale.h>
+
+#ifdef _WIN32
+#include "conio.h"
+#else
+#include "client/cli/linux_compatibility/conio_polyfill.h"
+#endif
+
 
 #include "common/structures.h"
 #ifdef _WIN32
@@ -30,21 +35,6 @@ static int vider_tampon(FILE *fp)
 
 int main () {
     setlocale(LC_CTYPE, "");
-    field vide = {
-            .visual = 0x0020,
-            .txt = _T(' '),
-            .destructible = 0,
-    };
-    field bricks = {
-            .visual = 0x2591,
-            .txt = _T('m'),
-            .destructible = 1,
-    };
-    field mur = {
-            .visual = 0x2588,
-            .txt = _T('x'),
-            .destructible = 0,
-    };
     player playerOne = {
             .visual = '1',
             .position = 0,
@@ -63,11 +53,13 @@ int main () {
     };
 
 #ifdef _WIN32
-    EnableVTMode();
-    SetupConsoleForUnicode();
+    puts("win32 detected");
+    enableVtMode();
+    setupConsoleForUnicode();
+    loadCharmap();
 #endif
     fflush(stdout);
-    _putts(L"Bienvenue dans le casse briques.");
+    _putts(_T("Bienvenue dans le casse briques."));
     _putts(_TEXT("Appuyez sur une touche pour continuer."));
     getchar();
     _putts(_TEXT("\033[2J\033[H"));
@@ -93,13 +85,13 @@ int main () {
         int position = 0;
         while (lettre!=EOF) {
             if (lettre==mur.txt) {
-                wprintf(L"%lc", mur.visual);
+                _tprintf(_T("%"W"c"),wide ? charmap[mur.visual] : mur.visual);
                 position++;
             } else if (lettre==bricks.txt) {
-                wprintf(L"%lc", bricks.visual);
+                _tprintf(_T("%"W"c"),wide ? charmap[bricks.visual] : bricks.visual);
                 position++;
             } else if (lettre==vide.txt) {
-                wprintf(L"%lc", vide.visual);
+                _tprintf(_T("%"W"c"),wide ? charmap[vide.visual] : vide.visual);
                 position++;
             } else if (lettre=='p') {
                 position++;
@@ -202,4 +194,6 @@ int main () {
 
         }
     }
+
+    fclose(f);
 }

@@ -1,6 +1,6 @@
 bombs=1
-columns=15
-rows=13
+column=15
+row=13
 xxxxxxxxxxxxxxx
 xp mmmmmmmmm px
 x xmxmxmxmxmx x
