@@ -14,7 +14,7 @@ add_executable(casses_briques-gui
         programme/client/gui/sdl-functions.c
         programme/client/gui/sdl-functions.h
         programme/common/game_rules/gameRules.c
-        programme/common/game_rules/gameRules.h)
+        programme/common/game_rules/gameRules.h programme/common/linked_list/linked_lists.c programme/common/linked_list/linked_lists.h)
 target_include_directories(casses_briques-gui PRIVATE programme)
 
 add_executable(casses_briques-cli
@@ -26,7 +26,7 @@ add_executable(casses_briques-cli
         programme/client/cli/grilleDisplay.c
         programme/client/cli/grilleDisplay.h
         programme/client/cli/client.c
-        programme/client/cli/client.h)
+        programme/client/cli/client.h programme/common/linked_list/linked_lists.c programme/common/linked_list/linked_lists.h)
 target_include_directories(casses_briques-cli PRIVATE programme)
 
 add_executable(casses_briques-server
@@ -39,7 +39,7 @@ add_executable(casses_briques-server
         programme/client/cli/grilleDisplay.c
         programme/client/cli/grilleDisplay.h
         programme/client/cli/client.c
-        programme/client/cli/client.h)
+        programme/client/cli/client.h programme/common/linked_list/linked_lists.c programme/common/linked_list/linked_lists.h)
 target_include_directories(casses_briques-server PRIVATE programme)
 
 if(UNIX)
