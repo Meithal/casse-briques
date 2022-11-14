@@ -230,7 +230,7 @@ DWORD WINAPI threadServerListenClient(LPVOID payload) {
     addSocketToGame(hostedGame, cs);
     onConnectCallback(*cs);
 
-    if (!connectionClient(*cs)) {
+    if (!connectionClient(cs)) {
         _tprintf(_T("Erreur avec le client %"W"s\n"), friendlyErrorMessage(WSAGetLastError()));
         nRetval = 3;
     }
@@ -290,6 +290,7 @@ static _Bool addSocketToGame(hosted_game * hostedGame, const SOCKET * socket)
                     hostedGame->board->nb_players - getPlacesRestantes(hostedGame)
             ]};
 
+    return 1;
 }
 
 void intHandler(int val) {

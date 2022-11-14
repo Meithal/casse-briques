@@ -128,8 +128,8 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
         mapView(0x100, bufOut, hostedGame->board, afficheJoueurs);
         _putts(bufOut);
 
-        if (kbhit()) {
-            int ch = getch();
+        if (_kbhit()) {
+            int ch = _getch();
 
             if (ch == 'q') {
                 break;

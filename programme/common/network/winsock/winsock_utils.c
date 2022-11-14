@@ -292,18 +292,18 @@ _Bool shutdownConnection(SOCKET sd)
     return 1;
 }
 
-_Bool connectionClient(SOCKET sd) {
+_Bool connectionClient(const SOCKET *sd) {
     // Read data from client
     char acReadBuffer[K_BUFFER_SIZE];
     int nReadBytes;
     do {
-        nReadBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
+        nReadBytes = recv(*sd, acReadBuffer, K_BUFFER_SIZE, 0);
         if (nReadBytes > 0) {
             _tprintf(_T("Received %d bytes from client.\n"), nReadBytes);
 
             int nSentBytes = 0;
             while (nSentBytes < nReadBytes) {
-                int nTemp = send(sd, acReadBuffer + nSentBytes,
+                int nTemp = send(*sd, acReadBuffer + nSentBytes,
                                  nReadBytes - nSentBytes, 0);
                 if (nTemp > 0) {
                     _tprintf(_T("Sent %d bytes back to client.\n"), nTemp);
