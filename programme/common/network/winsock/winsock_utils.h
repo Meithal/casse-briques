@@ -14,13 +14,15 @@
 
 #define K_BUFFER_SIZE 1024
 
+struct threadServerArguments {
+    SOCKET * serverSocket;
+    void* extras;
+};
+
+
 int startWinsock();
 int stopWinsock();
-void startServer(
-        SOCKET * s,
-        LPTHREAD_START_ROUTINE (threadServerListenClient),
-        int * serverPort
-);
+void startServer(SOCKET *s, LPTHREAD_START_ROUTINE threadServerListenClient, int *serverPort, void *arguments);
 void closeServer(const SOCKET *s);
 _Bool shutdownConnection(SOCKET sd);
 _Bool connectionClient(SOCKET sd);

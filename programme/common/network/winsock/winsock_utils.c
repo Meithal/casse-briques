@@ -68,7 +68,7 @@ _TCHAR * friendlyErrorMessage(DWORD errorCode) {
     return friendlyBuffer;
 }
 
-void startServer(SOCKET * s, LPTHREAD_START_ROUTINE threadServerListenClient, int * serverPort)
+void startServer(SOCKET *s, LPTHREAD_START_ROUTINE threadServerListenClient, int *serverPort, void *arguments)
 {
     struct sockaddr_in server;
     WSAEVENT listenSocketEvent;
@@ -158,7 +158,7 @@ void startServer(SOCKET * s, LPTHREAD_START_ROUTINE threadServerListenClient, in
             0,
             0,
             threadServerListenClient,
-            (void *) sd,
+            (void *) &(struct threadServerArguments) {.serverSocket = &sd, .extras = arguments},
             0,
             &nThreadId
         );
@@ -169,7 +169,7 @@ cleanup:return;
 
 SOCKET startClient(char* address, int port)
 {
-    SOCKET ConnectSocket = INVALID_SOCKET;
+    SOCKET connectSocket = INVALID_SOCKET;
     struct addrinfo *result = NULL,
             *ptr = NULL,
             hints;
@@ -188,26 +188,26 @@ SOCKET startClient(char* address, int port)
     if ( iResult != 0 ) {
         _tprintf(_T("getaddrinfo failed with error: %d\n"), iResult);
 
-        return NULL;
+        return 0;
     }
 
     // Attempt to connect to an address until one succeeds
     for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
 
         // Create a SOCKET for connecting to server
-        ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
+        connectSocket = socket(ptr->ai_family, ptr->ai_socktype,
                                ptr->ai_protocol);
-        if (ConnectSocket == INVALID_SOCKET) {
+        if (connectSocket == INVALID_SOCKET) {
             _tprintf(_T("socket failed with error: %ld\n"), WSAGetLastError());
 
-            return NULL;
+            return 0;
         }
 
         // Connect to server.
-        iResult = connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+        iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
         if (iResult == SOCKET_ERROR) {
-            closesocket(ConnectSocket);
-            ConnectSocket = INVALID_SOCKET;
+            closesocket(connectSocket);
+            connectSocket = INVALID_SOCKET;
             continue;
         }
         break;
@@ -215,13 +215,13 @@ SOCKET startClient(char* address, int port)
 
     freeaddrinfo(result);
 
-    if (ConnectSocket == INVALID_SOCKET) {
+    if (connectSocket == INVALID_SOCKET) {
         _tprintf(_T("Unable to connect to server!\n"));
-        return NULL;
+        return 0;
     }
 
     _tprintf(_T("Connected to server!\n"));
-    return ConnectSocket;
+    return connectSocket;
 }
 
 void closeClient(const SOCKET s)

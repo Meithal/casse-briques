@@ -75,7 +75,7 @@ struct clientListener {
     SOCKET sock;
     char * outbuf;
 };
-DWORD WINAPI threadClientListener(LPVOID pClientListener)
+DWORD WINAPI threadClientToServerListener(LPVOID pClientListener)
 {
     struct clientListener * clientListener = pClientListener;
 
@@ -111,17 +111,18 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
     SOCKET clientSock = startClient("localhost", hostedGame->serverPort);
     HANDLE listenerThread = CreateThread(
             NULL, 0,
-            threadClientListener, (LPVOID) &(struct clientListener) {
-                .sock = clientSock,
-                .outbuf = outBuf
-                }, 0, NULL
+            threadClientToServerListener, (LPVOID) &(struct clientListener) {
+                    .sock = clientSock,
+                    .outbuf = outBuf
+            }, 0, NULL
     );
 
     while (1) {
         Sleep(200);
         _tprintf(_T("\033[H"));
+//        _tprintf(_T("\033[2J"));
 
-        //updateGameFromServer(hostedGame);
+//        updateGameFromServer(hostedGame);
 
         _TCHAR bufOut[0x100] = {0};
         mapView(0x100, bufOut, hostedGame->board, afficheJoueurs);

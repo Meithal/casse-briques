@@ -29,6 +29,7 @@ void onConnectCallback(SOCKET sock);
 
 void intHandler(int val);
 static int showAvailableMaps(char * folder);
+static _Bool addSocketToGame(hosted_game * hostedGame, const SOCKET * socket);
 
 HANDLE consoleWriteMutex;
 
@@ -54,6 +55,8 @@ int main()
     enableVtMode();
     setupConsoleForUnicode();
     loadCharmap();
+
+    _tprintf(_T("Console windows, code point %d\n"), GetConsoleCP());
 #endif
     consoleWriteEvent = CreateEvent(
             NULL, TRUE, FALSE, TEXT("WaitConsole")
@@ -186,8 +189,7 @@ DWORD WINAPI threadServeur(LPVOID phosted_game)
     startServer(
             &s,
             (LPTHREAD_START_ROUTINE) threadServerListenClient,
-            &hostedGame->serverPort
-    );
+            &hostedGame->serverPort, phosted_game);
     closeServer(&s);
 
     return retVal;
@@ -219,19 +221,22 @@ void onConnectCallback(SOCKET sock)
 //    } while (nReadBytes != 0);
 }
 
-DWORD WINAPI threadServerListenClient(LPVOID sd_) {
+DWORD WINAPI threadServerListenClient(LPVOID payload) {
     int nRetval = 0;
-    SOCKET sd = (SOCKET)sd_;
+    struct threadServerArguments * sd = payload;
+    SOCKET *cs = sd->serverSocket;
+    hosted_game * hostedGame = sd->extras;
 
-    onConnectCallback(sd);
+    addSocketToGame(hostedGame, cs);
+    onConnectCallback(*cs);
 
-    if (!connectionClient(sd)) {
+    if (!connectionClient(*cs)) {
         _tprintf(_T("Erreur avec le client %"W"s\n"), friendlyErrorMessage(WSAGetLastError()));
         nRetval = 3;
     }
 
     _putts(_T("Fermeture connection avec client..."));
-    if (shutdownConnection(sd)) {
+    if (shutdownConnection(*cs)) {
         _tprintf(_T("Connection is down."));
     }
     else {
@@ -276,6 +281,15 @@ static int showAvailableMaps(char * folder) {
     if(fol) closedir(fol);
 
     return ret;
+}
+
+static _Bool addSocketToGame(hosted_game * hostedGame, const SOCKET * socket)
+{
+    hostedGame->hostData.clientPlayers[hostedGame->hostData.nbClients++] =
+            (struct clientPlayer) {.connection = *socket, .player = &(*hostedGame->board->players)[
+                    hostedGame->board->nb_players - getPlacesRestantes(hostedGame)
+            ]};
+
 }
 
 void intHandler(int val) {
