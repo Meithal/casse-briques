@@ -29,7 +29,7 @@ void onConnectCallback(SOCKET sock);
 
 void intHandler(int val);
 static int showAvailableMaps(char * folder);
-static _Bool addSocketToGame(hosted_game * hostedGame, const SOCKET * socket);
+static int addSocketToGame(hosted_game * hostedGame, const SOCKET * socket);
 
 HANDLE consoleWriteMutex;
 
@@ -184,6 +184,7 @@ DWORD WINAPI threadServeur(LPVOID phosted_game)
     setAIPlayers(ias, board);
     hostedGame->serverPort = 41480;
     hostedGame->mapNumber = map;
+    hostedGame->hostData.clientPlayers = malloc(sizeof (struct clientPlayer) * board->nb_players);
 
     SOCKET s;
     startServer(
@@ -225,9 +226,20 @@ DWORD WINAPI threadServerListenClient(LPVOID payload) {
     int nRetval = 0;
     struct threadServerArguments * sd = payload;
     SOCKET cs = sd->serverSocket;
+    struct sockaddr_in sockaddrIn = sd->socketAddress;
     hosted_game * hostedGame = sd->extras;
 
-    addSocketToGame(hostedGame, &cs);
+
+    TCHAR outBuf[40] = {0};
+    InetNtop(AF_INET, &sockaddrIn.sin_addr, outBuf, 40);
+
+    _tprintf(_T("Démarrage du thread liaison avec client %"W"s sur port %d"),
+             outBuf, ntohs(sockaddrIn.sin_port));
+
+    int playerNumber = addSocketToGame(hostedGame, &cs);
+    char buf[10];
+    sprintf(buf, "hello %d", playerNumber);
+    send(cs, buf, strlen(buf), 0);
     onConnectCallback(cs);
 
     if (!connectionClient(cs)) {
@@ -283,14 +295,14 @@ static int showAvailableMaps(char * folder) {
     return ret;
 }
 
-static _Bool addSocketToGame(hosted_game * hostedGame, const SOCKET * socket)
+static int addSocketToGame(hosted_game * hostedGame, const SOCKET * socket)
 {
-    hostedGame->hostData.clientPlayers[hostedGame->hostData.nbClients++] =
+    (*hostedGame->hostData.clientPlayers)[hostedGame->hostData.nbClients++] =
             (struct clientPlayer) {.connection = *socket, .player = &(*hostedGame->board->players)[
                     hostedGame->board->nb_players - getPlacesRestantes(hostedGame)
             ]};
 
-    return 1;
+    return hostedGame->hostData.nbClients - 1;
 }
 
 void intHandler(int val) {

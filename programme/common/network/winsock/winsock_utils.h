@@ -16,6 +16,7 @@
 
 struct threadServerArguments {
     SOCKET serverSocket;
+    struct sockaddr_in socketAddress;
     void* extras;
 };
 
@@ -25,7 +26,7 @@ int stopWinsock();
 void startServer(SOCKET *s, LPTHREAD_START_ROUTINE threadServerListenClient, int *serverPort, void *arguments);
 void closeServer(const SOCKET *s);
 _Bool shutdownConnection(SOCKET sd);
-_Bool connectionClient(const SOCKET sd);
+_Bool connectionClient(SOCKET sd);
 _TCHAR * friendlyErrorMessage(DWORD errorCode);
 SOCKET startClient(char* address, int port);
 void closeClient(SOCKET s);

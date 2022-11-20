@@ -148,9 +148,19 @@ void startServer(SOCKET *s, LPTHREAD_START_ROUTINE threadServerListenClient, int
         TCHAR outBuf[40] = {0};
         InetNtop(AF_INET, &sinRemote.sin_addr, outBuf, 40);
 
-        _tprintf(_T("Connection depuis %s, %d\n"),
+        _tprintf(_T("Connection depuis %"W"s, notre port %d\n"),
                outBuf,
                ntohs(sinRemote.sin_port));
+
+        struct sockaddr remote;
+        socklen_t addrlen = sizeof remote;
+        if(0!=getpeername(sd, &remote, &addrlen)) {
+            _tprintf(_T("getpeername() fail %"W"s\n"), friendlyErrorMessage(
+                    WSAGetLastError()));
+        }
+        _tprintf(_T("Port distant (serveur) %d\n"),
+                 ntohs(((struct sockaddr_in*)&remote)->sin_port));
+
 
         DWORD nThreadId;
 
@@ -158,7 +168,9 @@ void startServer(SOCKET *s, LPTHREAD_START_ROUTINE threadServerListenClient, int
             0,
             0,
             threadServerListenClient,
-            (void *) &(struct threadServerArguments) {.serverSocket = sd, .extras = arguments},
+            (void *) &(struct threadServerArguments) {
+                .serverSocket = sd, .socketAddress = sinRemote, .extras = arguments
+            },
             0,
             &nThreadId
         );
@@ -210,6 +222,21 @@ SOCKET startClient(char* address, int port)
             connectSocket = INVALID_SOCKET;
             continue;
         }
+
+        _tprintf(_T("Connected to remote, our port is %d\n"),
+                 ntohs(((struct sockaddr_in*)ptr->ai_addr)->sin_port)
+        );
+
+        struct sockaddr remote;
+        socklen_t addrlen = sizeof remote;
+        if(0!=getpeername(connectSocket, &remote, &addrlen)) {
+            _tprintf(_T("getpeername() fail %"W"s\n"), friendlyErrorMessage(
+                    WSAGetLastError()));
+        }
+
+        _tprintf(_T("Port distant (client) %d\n"),
+                 ntohs(((struct sockaddr_in*)&remote)->sin_port));
+
         break;
     }
 

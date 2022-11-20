@@ -3,12 +3,17 @@
 //
 
 #include "json.h"
+
+#include "client/callbacks.h"
+
 #include "client.h"
 
 
 static char *afficheJoueurs(int currentTile, struct player *player) {
     return "p";
 }
+
+static void updateGameFromServerMessages(hosted_game* hostedGame);
 
 void openNewConsole()
 {
@@ -85,7 +90,7 @@ DWORD WINAPI threadClientToServerListener(LPVOID pClientListener)
         iResult = recv(clientListener->sock, recvbuf, 0x200, 0);
         if ( iResult > 0 ) {
 //            _tprintf(_T("Bytes received: %d\n"), iResult);
-            strcpy(clientListener->outbuf, recvbuf);
+            strcat(clientListener->outbuf, recvbuf);
         }
 //        else if ( iResult == 0 )
 //            _tprintf(_T("Connection closed\n"));
@@ -117,6 +122,10 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
             }, 0, NULL
     );
 
+    hostedGame->clientData.serverMessages = outBuf;
+    updateGameFromServerMessages(hostedGame);
+
+
     while (1) {
         Sleep(200);
         _tprintf(_T("\033[H"));
@@ -136,6 +145,9 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
             }
             _tprintf(_T("%d\n"), ch);
         }
+
+        updateGameFromServerMessages(hostedGame);
+
         _putts(_T("Messages du serveur"));
 #ifdef _UNICODE
         mbstowcs(wOutBuf, outBuf, strlen(outBuf)+1);
@@ -151,4 +163,24 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
     _putts(_T(""));
     SetEvent(consoleWriteEvent);
     return 0;
+}
+
+static void updateGameFromServerMessages(hosted_game* hostedGame)
+{
+    char * buffer = hostedGame->clientData.serverMessages
+            + hostedGame->clientData.serverMessagesCursor;
+
+    int len;
+    if(!(len = strlen(buffer))) {
+        return;
+    }
+
+    if(memcmp(buffer, "hello", 5) == 0) {
+        int slot = -1;
+        sscanf(buffer, "hello %d", &slot);
+        onGameSlotAssigned(hostedGame, slot);
+    }
+
+
+    hostedGame->clientData.serverMessagesCursor += len;
 }

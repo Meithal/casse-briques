@@ -42,6 +42,7 @@ typedef struct clientPlayer clientPlayer;
 struct clientPlayer {
     struct player * player;
     SOCKET connection;
+    struct sockaddr_in socketAddress;
 };
 
 typedef struct hosted_game hosted_game;
@@ -49,17 +50,16 @@ struct hosted_game {
     board *board;
     int mapNumber;
     int serverPort;
-    union {
-        struct {
-            SOCKET serverSocket;
-            int nbClients;
-            clientPlayer clientPlayers[];
-        } hostData;
-        struct {
-            SOCKET clientSocket;
-            char * serverMessages;
-        } clientData;
-    };
+    struct {
+        SOCKET serverSocket;
+        int nbClients;
+        clientPlayer (*clientPlayers)[];
+    } hostData;
+    struct {
+        SOCKET clientSocket;
+        char * serverMessages;
+        int serverMessagesCursor;
+    } clientData;
 };
 
 extern field vide;
