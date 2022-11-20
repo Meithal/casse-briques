@@ -139,7 +139,7 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
         _putts(_T("Messages du serveur"));
 #ifdef _UNICODE
         mbstowcs(wOutBuf, outBuf, strlen(outBuf)+1);
-        _tprintf(_T("%s\n"), wOutBuf);
+        _tprintf(_T("%"W"s\n"), wOutBuf);
 #else
         _tprintf(_T("%10s\n"), outBuf);
 #endif

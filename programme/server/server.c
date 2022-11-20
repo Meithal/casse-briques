@@ -224,11 +224,11 @@ void onConnectCallback(SOCKET sock)
 DWORD WINAPI threadServerListenClient(LPVOID payload) {
     int nRetval = 0;
     struct threadServerArguments * sd = payload;
-    SOCKET *cs = sd->serverSocket;
+    SOCKET cs = sd->serverSocket;
     hosted_game * hostedGame = sd->extras;
 
-    addSocketToGame(hostedGame, cs);
-    onConnectCallback(*cs);
+    addSocketToGame(hostedGame, &cs);
+    onConnectCallback(cs);
 
     if (!connectionClient(cs)) {
         _tprintf(_T("Erreur avec le client %"W"s\n"), friendlyErrorMessage(WSAGetLastError()));
@@ -236,7 +236,7 @@ DWORD WINAPI threadServerListenClient(LPVOID payload) {
     }
 
     _putts(_T("Fermeture connection avec client..."));
-    if (shutdownConnection(*cs)) {
+    if (shutdownConnection(cs)) {
         _tprintf(_T("Connection is down."));
     }
     else {
