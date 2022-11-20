@@ -224,14 +224,14 @@ void onConnectCallback(SOCKET sock)
 //    } while (nReadBytes != 0);
 }
 
-static void onMessageFromClient(void *hostedGame, char* message) {
-
+void onMessageFromClient(void *hostedGame, char* message) {
+    _putts(_T("On message from client"));
 }
 
 DWORD WINAPI threadServerListenClient(LPVOID payload) {
     int nRetval = 0;
     struct threadServerArguments * sd = payload;
-    SOCKET cs = sd->serverSocket;
+    SOCKET cs = sd->toClientSocket;
     struct sockaddr_in sockaddrIn = sd->socketAddress;
     hosted_game * hostedGame = sd->extras;
 

@@ -32,6 +32,11 @@ field mur = {
 };
 
 
+static tile getTileAt(board*board, int y, int x)
+{
+    return (*board->board)[board->cols * y + x];
+}
+
 int loadMap(char* path, board * board)
 {
     FILE* f = fopen(path, "r");
@@ -160,4 +165,14 @@ player * playerAtPosition(board*board, int y, int x)
         }
     }
     return NULL;
+}
+
+_Bool canMoveAt(board*board, player*player, struct vec2dir to)
+{
+    tile tile = getTileAt(board, player->line + to.y, player->col + to.x);
+    if(tile.type->txt == 'm' || tile.type->txt == 'x') {
+        return 0;
+    }
+
+    return 1;
 }

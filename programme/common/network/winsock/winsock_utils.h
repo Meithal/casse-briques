@@ -15,7 +15,7 @@
 #define K_BUFFER_SIZE 1024
 
 struct threadServerArguments {
-    SOCKET serverSocket;
+    SOCKET toClientSocket;
     struct sockaddr_in socketAddress;
     void* extras;
 };

@@ -36,6 +36,11 @@ void onDeplacementDemande(hosted_game* hostedGame, int direction)
         default: break;
     }
     player *self = &(*hostedGame->board->players)[selfIdx];
+
+    if(!canMoveAt(hostedGame->board, self, dir)) {
+        return;
+    }
+
     self->col += dir.x;
     self->line += dir.y;
 

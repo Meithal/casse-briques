@@ -169,7 +169,7 @@ void startServer(SOCKET *s, LPTHREAD_START_ROUTINE threadServerListenClient, int
             0,
             threadServerListenClient,
             (void *) &(struct threadServerArguments) {
-                .serverSocket = sd, .socketAddress = sinRemote, .extras = arguments
+                .toClientSocket = sd, .socketAddress = sinRemote, .extras = arguments
             },
             0,
             &nThreadId
@@ -319,7 +319,7 @@ _Bool shutdownConnection(SOCKET sd)
     return 1;
 }
 
-_Bool connectionClient(const SOCKET sd, void(*callback)(void* extra, char* message), void* extra) {
+_Bool connectionClient(const SOCKET sd, void(*callback)(void* extra, char* message), void* extraa) {
     // Read data from client
     char acReadBuffer[K_BUFFER_SIZE];
     int nReadBytes;
@@ -327,7 +327,9 @@ _Bool connectionClient(const SOCKET sd, void(*callback)(void* extra, char* messa
         nReadBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
         if (nReadBytes > 0) {
             _tprintf(_T("Received %d bytes from client.\n"), nReadBytes);
-            callback(extra, acReadBuffer);
+            _putts(_T("\a"));
+
+            callback(extraa, acReadBuffer);
         }
         else if (nReadBytes == SOCKET_ERROR) {
             if(WSAGetLastError() == WSAEWOULDBLOCK) {
