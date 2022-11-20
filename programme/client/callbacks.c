@@ -46,3 +46,18 @@ void onDeplacementDemande(hosted_game* hostedGame, int direction)
 
     hostedGame->updateAsked = 1;
 }
+
+void onBombePoseDemande(hosted_game* hostedGame)
+{
+    // si on a toujours pas recu le hello du serveur
+    // on ne sait pas qui on est, alors on quitte tôt
+    if(hostedGame->clientData.selfIndex == GAME_CLIENT_INDEX_UNASSIGNED) {
+        return;
+    }
+    int selfIdx = hostedGame->clientData.selfIndex;
+    player *self = &(*hostedGame->board->players)[selfIdx];
+
+    if(canLayBombAt(hostedGame->board, self)) {
+        layBomb(hostedGame->board, self);
+    }
+}

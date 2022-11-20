@@ -24,7 +24,9 @@ int getPlacesRestantes(hosted_game * hostedGame);
 hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[], int idx);
 player * playerAtPosition(board*board, int y, int x);
 _Bool canMoveAt(board*board, player*player, struct vec2dir to);
-
+bombe * bombAt(board*board, int y, int x);
+_Bool canLayBombAt(board*board, player*player);
+void layBomb(board*board, player*player);
 
 extern int charmap[0xff];
 extern const int wide;

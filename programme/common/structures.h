@@ -27,6 +27,17 @@ struct player {
     int is_ia;
     int visual; // utilise pour le code client
     int position; // utilise pour le code client
+    int max_bombes;
+    int bombes_au_sol;
+    int portee_bombe;
+};
+
+typedef struct bombe bombe;
+struct bombe {
+    int line;
+    int col;
+    unsigned long long laid_at_ms;
+    unsigned long long fuse_time_ms;
 };
 
 typedef struct board board;
@@ -36,6 +47,8 @@ struct board {
     struct tile (* board)[];
     int nb_players;
     struct player (* players)[];
+    int nb_bombes;
+    struct bombe (* bombes)[];
 };
 
 typedef struct clientPlayer clientPlayer;

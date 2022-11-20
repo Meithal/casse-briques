@@ -158,6 +158,10 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
                 case 'k':
                 case 'l':
                     onDeplacementDemande(hostedGame, ch);
+                    break;
+                case ' ':
+                    onBombePoseDemande(hostedGame);
+                    break;
                 default: break;
             }
 

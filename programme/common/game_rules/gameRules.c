@@ -89,6 +89,7 @@ int loadMap(char* path, board * board)
             (*board->players)[players].line = j;
             (*board->players)[players].col = i;
             (*board->players)[players].is_ia = 0;
+            (*board->players)[players].max_bombes = bombes;
 
             players++;
         }
@@ -100,6 +101,12 @@ int loadMap(char* path, board * board)
     board->rows = lignes;
     board->cols = cols;
 
+    board->bombes = calloc(players * 5, sizeof (struct bombe)); // arbitrairement 5 bombes en même temps par joueur
+    for(int i = 0; i < players * 5; i++) {
+        (*board->bombes)[i].col = -1;
+        (*board->bombes)[i].line = -1;
+    }
+
 //    fclose(f);
 
     return 0;
@@ -108,6 +115,7 @@ int loadMap(char* path, board * board)
 void unloadMap(board *board) {
     free(board->players);
     free(board->board);
+    free(board->bombes);
 }
 
 int setAIPlayers(int number, board * board)
@@ -175,4 +183,48 @@ _Bool canMoveAt(board*board, player*player, struct vec2dir to)
     }
 
     return 1;
+}
+
+bombe * bombAt(board*board, int y, int x)
+{
+    for(int i = 0; i < board->nb_players * 5; i++) {
+        bombe *bombe = &(*board->bombes)[i];
+        // si une bombe existe deja a l'emplacement du joueur
+        if(bombe->line == y && bombe->col == x) {
+            return bombe;
+        }
+    }
+
+    return NULL;
+}
+
+_Bool canLayBombAt(board*board, player*player)
+{
+    for(int i = 0; i < board->nb_players * 5; i++) {
+        bombe bombe = (*board->bombes)[i];
+        // si une bombe existe deja a l'emplacement du joueur
+        if(bombe.line == player->line && bombe.col == player->col) {
+            return 0;
+        }
+    }
+
+    if(player->bombes_au_sol >= player->max_bombes) {
+        return 0;
+    }
+
+    return 1;
+}
+
+void layBomb(board*board, player*player)
+{
+    player->bombes_au_sol ++;
+
+    for(int i = 0; i < board->nb_players * 5; i++) {
+        bombe *bombe = &(*board->bombes)[i];
+        // si une bombe existe deja a l'emplacement du joueur
+        if(bombe->line == -1 && bombe->col == -1) {
+            bombe->line = player->line;
+            bombe->col = player->col;
+        }
+    }
 }
