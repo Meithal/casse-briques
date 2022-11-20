@@ -19,6 +19,16 @@ void mapView(int size,
             board->rows,
             board->cols
     );
+    for (int i = 0; i < board->nb_players ; i++) {
+        written += _sntprintf(
+                buffer + written,
+                size - written - 1,
+                _T("player %d max bombes: %d bombes au sol %d\n"),
+                i,
+                (*board->players)[i].max_bombes,
+                (*board->players)[i].bombes_au_sol
+        );
+    }
 
     for (int j = 0; j < board->rows; j++) {
         for (int i = 0; i < board->cols; ++i) {

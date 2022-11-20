@@ -2,6 +2,7 @@
 // Created by Utilisateur on 20/11/2022.
 //
 
+#include "stdio.h"
 #include "tchar.h"
 
 #include "callbacks.h"

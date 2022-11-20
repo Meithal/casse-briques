@@ -276,7 +276,6 @@ void closeServer(const SOCKET *s)
     if (s != NULL)
         closesocket(*s);
 
-    closesocket(*s);
     _putts(_T("Server closed."));
 }
 

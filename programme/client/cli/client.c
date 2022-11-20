@@ -2,7 +2,7 @@
 // Created by hurin on 05/11/2022.
 //
 
-#include "json.h"
+//#include "json.h"
 
 #include "client/callbacks.h"
 
@@ -145,8 +145,8 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
 
 //        updateGameFromServer(hostedGame);
 
-        _TCHAR bufOut[0x100] = {0};
-        mapView(0x100, bufOut, hostedGame->board, afficheJoueurs);
+        _TCHAR bufOut[0x400] = {0};
+        mapView(0x400, bufOut, hostedGame->board, afficheJoueurs);
         _putts(bufOut);
 
         if (_kbhit()) {

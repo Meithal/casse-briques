@@ -9,7 +9,7 @@
 #include <winsock2.h>
 #include "dirent.h"
 #include "conio.h"
-#include "json.h"
+//#include "json.h"
 
 #include "common/network/winsock/winsock_utils.h"
 
@@ -75,8 +75,8 @@ int main()
         case 1: {
             _putts(_T("Parties en cours :"));
             for (int i = 0; i < hostedGamesIdx; ++i) {
-                _TCHAR bufOut[0x100] = {0};
-                mapView(0x100, bufOut, hostedGames[i].board, NULL);
+                _TCHAR bufOut[0x200] = {0};
+                mapView(0x200, bufOut, hostedGames[i].board, NULL);
 
                 _tprintf(_T("%d. \033[33mPlaces restantes : %d\033[0m\n%"W"s"),
                     i+1,
@@ -286,8 +286,8 @@ static int showAvailableMaps(char * folder) {
         board board;
 
         loadMap(buf, &board);
-        _TCHAR bufOut[0x100] = {0};
-        mapView(0x100, bufOut, &board, NULL);
+        _TCHAR bufOut[0x200] = {0};
+        mapView(0x200, bufOut, &board, NULL);
        // _putts(buf);
         wchar_t longName[MAX_PATH] = {0};
         mbstowcs(longName, desc->d_name, desc->d_namlen);

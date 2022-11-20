@@ -142,7 +142,7 @@ add_subdirectory(vendor/freetype)
 
 target_link_libraries(casses_briques-gui PRIVATE freetype)
 
-add_subdirectory(vendor/json)
-target_link_libraries(casses_briques-server PUBLIC sjson)
-target_link_libraries(casses_briques-cli PUBLIC sjson)
-target_link_libraries(casses_briques-gui PUBLIC sjson)
+#add_subdirectory(vendor/json)
+#target_link_libraries(casses_briques-server PUBLIC sjson)
+#target_link_libraries(casses_briques-cli PUBLIC sjson)
+#target_link_libraries(casses_briques-gui PUBLIC sjson)

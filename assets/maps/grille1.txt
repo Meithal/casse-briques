@@ -1,4 +1,4 @@
-bombs=1
+bombs=2
 column=9
 row=5
 xxxxxxxxx

@@ -38,6 +38,7 @@ struct bombe {
     int col;
     unsigned long long laid_at_ms;
     unsigned long long fuse_time_ms;
+    unsigned long long explosed_at_ms;
 };
 
 typedef struct board board;

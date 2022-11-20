@@ -65,6 +65,10 @@ int loadMap(char* path, board * board)
     #else
     board->board = malloc(sizeof (tile[lignes][cols]));
     #endif
+    if (board->board == NULL) {
+        return 1;
+    }
+    
     board->players = NULL;
 
 //    typedef tile (boardptr)[board->rows][board->cols];
@@ -90,6 +94,7 @@ int loadMap(char* path, board * board)
             (*board->players)[players].col = i;
             (*board->players)[players].is_ia = 0;
             (*board->players)[players].max_bombes = bombes;
+            (*board->players)[players].bombes_au_sol = 0;
 
             players++;
         }
@@ -102,6 +107,9 @@ int loadMap(char* path, board * board)
     board->cols = cols;
 
     board->bombes = calloc(players * 5, sizeof (struct bombe)); // arbitrairement 5 bombes en même temps par joueur
+    if (board->bombes == NULL) {
+        return 1;
+    }
     for(int i = 0; i < players * 5; i++) {
         (*board->bombes)[i].col = -1;
         (*board->bombes)[i].line = -1;
@@ -161,6 +169,8 @@ hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[], int idx)
             return &games[i];
         }
     }
+
+    return NULL;
 }
 
 player * playerAtPosition(board*board, int y, int x)
@@ -225,6 +235,7 @@ void layBomb(board*board, player*player)
         if(bombe->line == -1 && bombe->col == -1) {
             bombe->line = player->line;
             bombe->col = player->col;
+            return;
         }
     }
 }
