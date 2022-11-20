@@ -32,10 +32,11 @@ void mapView(int size,
         written += _sntprintf(
                 buffer + written,
                 size - written - 1,
-                _T("player %d max bombes: %d bombes au sol %d\n"),
+                _T("player %d max bombes: %d bombes au sol %d is_dead: %d\n"),
                 i,
                 (*board->players)[i].max_bombes,
-                (*board->players)[i].bombes_au_sol
+                (*board->players)[i].bombes_au_sol,
+                (*board->players)[i].is_dead
         );
     }
     for (int i = 0; i < board->nb_players * 5 ; i++) {

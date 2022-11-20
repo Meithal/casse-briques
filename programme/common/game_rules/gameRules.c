@@ -93,6 +93,7 @@ int loadMap(char* path, board * board)
             (*board->players)[players].line = j;
             (*board->players)[players].col = i;
             (*board->players)[players].is_ia = 0;
+            (*board->players)[players].is_dead = 0;
             (*board->players)[players].max_bombes = bombes;
             (*board->players)[players].bombes_au_sol = 0;
             (*board->players)[players].portee_bombe = 2;
@@ -291,6 +292,13 @@ void updateGameState(board*board)
         }
         if(isInDeflagration(board, board->rows, board->cols, &map, bombe->line, bombe->col)) {
             makeBombExplode(board, bombe);
+        }
+    }
+    for(int i = 0; i < board->nb_players; i++) {
+        player *player = &(*board->players)[i];
+
+        if(isInDeflagration(board, board->rows, board->cols, &map, player->line, player->col)) {
+            player->is_dead = 1;
         }
     }
 }

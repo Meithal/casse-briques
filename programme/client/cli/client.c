@@ -175,8 +175,12 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
         updateGameState(hostedGame->board);
         updateGameFromServerMessages(hostedGame);
 
-//        int selfIdx = hostedGame->clientData.selfIndex;
-//        player *self = &(*hostedGame->board->players)[selfIdx];
+        int selfIdx = hostedGame->clientData.selfIndex;
+        player *self = &(*hostedGame->board->players)[selfIdx];
+        if(self->is_dead) {
+            _putts(_T("Vous êtes mort !"));
+            break;
+        }
 //        layBomb(hostedGame->board, self);
 
 

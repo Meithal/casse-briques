@@ -30,6 +30,7 @@ struct player {
     int max_bombes;
     int bombes_au_sol;
     int portee_bombe;
+    int is_dead;
 };
 
 typedef struct bombe bombe;
