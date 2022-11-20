@@ -295,6 +295,12 @@ void computeDeflagration(int rows, int cols, _Bool (*map)[rows][cols], board*boa
             for(int portee = 0; portee <= bombe->portee ; portee ++) {
                 int row_at = bombe->line + portee * dy;
                 if(row_at < 0 || row_at >= board->rows) break;
+                tile target = getTileAt(board, bombe->line + portee * dy, bombe->col);
+                if(target.type->txt == 'x') break;
+                if(target.type->txt == 'm'){
+                    (*map)[bombe->line + portee * dy][bombe->col] = 1;
+                    break;
+                }
                 (*map)[bombe->line + portee * dy][bombe->col] = 1;
             }
         }
@@ -302,6 +308,13 @@ void computeDeflagration(int rows, int cols, _Bool (*map)[rows][cols], board*boa
             for(int portee = 0; portee <= bombe->portee ; portee ++) {
                 int col_at = bombe->col + portee * dx;
                 if(col_at < 0 || col_at >= board->cols) break;
+                tile target = getTileAt(board, bombe->line, bombe->col + portee * dx);
+                if(target.type->txt == 'x') break;
+                if(target.type->txt == 'm'){
+                    (*map)[bombe->line][bombe->col + portee * dx] = 1;
+                    break;
+                }
+
                 (*map)[bombe->line][bombe->col + portee * dx] = 1;
             }
         }

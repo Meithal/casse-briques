@@ -55,7 +55,7 @@ void mapView(int size,
     }
     for (int j = 0; j < board->rows; j++) {
         for (int i = 0; i < board->cols; ++i) {
-            if(isInDeflagration(board, board->rows, board->cols, &map, j, i)) { // quadratic :x, FIXME cache it
+            if(isInDeflagration(board, board->rows, board->cols, &map, j, i)) {
                 written += _sntprintf(buffer + written, size - written - 1, _T("*"));
             } else {
                 written += _sntprintf(buffer + written, size - written - 1, _T("."));
@@ -70,7 +70,7 @@ void mapView(int size,
             int vis = (*board->board)[j * board->cols + i].type->visual;
             vis = wide ? charmap[vis] : vis;
             player *playerAtPos = NULL;
-            if(isInDeflagration(board, board->rows, board->cols, &map, j, i)) { // quadratic :x, FIXME cache it
+            if(isInDeflagration(board, board->rows, board->cols, &map, j, i)) {
                 written += _sntprintf(buffer + written, size - written - 1, _T("*"));
             } else if(bombAt(board, j, i)) {
                 written += _sntprintf(buffer + written, size - written - 1, _T("*"));
