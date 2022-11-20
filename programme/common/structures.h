@@ -36,9 +36,11 @@ typedef struct bombe bombe;
 struct bombe {
     int line;
     int col;
+    int portee;
     unsigned long long laid_at_ms;
     unsigned long long fuse_time_ms;
     unsigned long long explosed_at_ms;
+    player * owner;
 };
 
 typedef struct board board;

@@ -95,6 +95,7 @@ int loadMap(char* path, board * board)
             (*board->players)[players].is_ia = 0;
             (*board->players)[players].max_bombes = bombes;
             (*board->players)[players].bombes_au_sol = 0;
+            (*board->players)[players].portee_bombe = 2;
 
             players++;
         }
@@ -113,6 +114,7 @@ int loadMap(char* path, board * board)
     for(int i = 0; i < players * 5; i++) {
         (*board->bombes)[i].col = -1;
         (*board->bombes)[i].line = -1;
+        (*board->bombes)[i].fuse_time_ms = 5000; // 5 secondes par defaut
     }
 
 //    fclose(f);
@@ -237,9 +239,72 @@ void layBomb(board*board, player*player)
         bombe *bombe = &(*board->bombes)[i];
         // si une bombe existe deja a l'emplacement du joueur
         if(bombe->line == -1 && bombe->col == -1) {
+            bombe->owner = player;
             bombe->line = player->line;
             bombe->col = player->col;
+            bombe->portee = player->portee_bombe;
+            bombe->laid_at_ms = GetTickCount64();
+            bombe->fuse_time_ms = 5000;
             return;
         }
     }
+}
+
+static void makeBombExplode(board*board, bombe* bombe) {
+    bombe->owner->bombes_au_sol--;
+    bombe->explosed_at_ms = GetTickCount64();
+}
+
+_Bool shouldExplodeBomb(bombe*bomb)
+{
+    ULONGLONG now = GetTickCount64();
+
+    return bomb->laid_at_ms + bomb->fuse_time_ms < now;
+}
+
+void updateGameState(board*board)
+{
+    ULONGLONG now = GetTickCount64();
+
+    for(int i = 0; i < board->nb_players * 5; i++) {
+        bombe *bombe = &(*board->bombes)[i];
+        if(bombe->laid_at_ms == 0) {
+            continue;
+        }
+        if(bombe->explosed_at_ms != 0) { // une bombe qu'on a fait exploser on ne la refait pas exploser
+            continue;
+        }
+        if(bombe->laid_at_ms + bombe->fuse_time_ms < now) {
+            makeBombExplode(board, bombe);
+        }
+    }
+}
+
+_Bool isInDeflagration(board*board, int rows, int cols, _Bool (*map)[rows][cols], int y, int x) {
+
+    return (*map)[y][x];
+}
+
+void computeDeflagration(int rows, int cols, _Bool (*map)[rows][cols], board*board)
+{
+    for(int i = 0; i < board->nb_players * 5; i++) {
+        bombe *bombe = &(*board->bombes)[i];
+        if(bombe->col == -1) continue;
+        if(bombe->explosed_at_ms == 0) continue;
+        for(int dy = -1; dy <= 1 ; dy += 2) {
+            for(int portee = 0; portee <= bombe->portee ; portee ++) {
+                int row_at = bombe->line + portee * dy;
+                if(row_at < 0 || row_at >= board->rows) break;
+                (*map)[bombe->line + portee * dy][bombe->col] = 1;
+            }
+        }
+        for(int dx = -1; dx <= 1; dx += 2) {
+            for(int portee = 0; portee <= bombe->portee ; portee ++) {
+                int col_at = bombe->col + portee * dx;
+                if(col_at < 0 || col_at >= board->cols) break;
+                (*map)[bombe->line][bombe->col + portee * dx] = 1;
+            }
+        }
+    }
+
 }

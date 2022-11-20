@@ -28,6 +28,12 @@ bombe * bombAt(board*board, int y, int x);
 _Bool canLayBombAt(board*board, player*player);
 void layBomb(board*board, player*player);
 
+void updateGameState(board*board);
+void computeDeflagration(int rows, int cols, _Bool (*map)[rows][cols], board*board);
+void freeDeflagration(int rows, int cols, _Bool (*map)[*][*]);
+_Bool isInDeflagration(board*board, int rows, int cols, _Bool (*map)[rows][cols], int y, int x);
+_Bool shouldExplodeBomb(bombe*bomb);
+
 extern int charmap[0xff];
 extern const int wide;
 

@@ -138,6 +138,7 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
     updateGameFromServerMessages(hostedGame);
 
 
+
     while (1) {
         Sleep(200);
         _tprintf(_T("\033[H"));
@@ -171,7 +172,13 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
             _tprintf(_T("%d\n"), ch);
         }
 
+        updateGameState(hostedGame->board);
         updateGameFromServerMessages(hostedGame);
+
+//        int selfIdx = hostedGame->clientData.selfIndex;
+//        player *self = &(*hostedGame->board->players)[selfIdx];
+//        layBomb(hostedGame->board, self);
+
 
         _putts(_T("Messages du serveur"));
 #ifdef _UNICODE
