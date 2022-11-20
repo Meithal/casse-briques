@@ -264,8 +264,19 @@ _Bool shouldExplodeBomb(bombe*bomb)
 
 void updateGameState(board*board)
 {
+    _Bool map[board->rows][board->cols];
+    for (int j = 0; j < board->rows; j++) {
+        for (int i = 0; i < board->cols; ++i) {
+            map[j][i] = 0;
+        }
+    }
+    computeDeflagration(board->rows, board->cols, &map, board);
+
+
+
     ULONGLONG now = GetTickCount64();
 
+    repeat:
     for(int i = 0; i < board->nb_players * 5; i++) {
         bombe *bombe = &(*board->bombes)[i];
         if(bombe->laid_at_ms == 0) {
@@ -275,6 +286,10 @@ void updateGameState(board*board)
             continue;
         }
         if(bombe->laid_at_ms + bombe->fuse_time_ms < now) {
+            makeBombExplode(board, bombe);
+            goto repeat;
+        }
+        if(isInDeflagration(board, board->rows, board->cols, &map, bombe->line, bombe->col)) {
             makeBombExplode(board, bombe);
         }
     }
