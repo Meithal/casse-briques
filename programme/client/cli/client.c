@@ -89,17 +89,23 @@ DWORD WINAPI threadClientToServerListener(LPVOID pClientListener)
     do {
         iResult = recv(clientListener->sock, recvbuf, 0x200, 0);
         if ( iResult > 0 ) {
-//            _tprintf(_T("Bytes received: %d\n"), iResult);
             strcat(clientListener->outbuf, recvbuf);
         }
-//        else if ( iResult == 0 )
-//            _tprintf(_T("Connection closed\n"));
-//        else
-//            _tprintf(_T("recv failed with error: %d\n"), WSAGetLastError());
 
     } while( iResult > 0 );
 }
 
+DWORD WINAPI threadClientToServerEmitter(LPVOID pHostedGame)
+{
+    struct hosted_game * hostedGame = pHostedGame;
+    if(hostedGame->updateAsked) {
+        char boardBuffer[0x200];
+        memcpy(boardBuffer, *hostedGame->board->players, sizeof (struct player) * hostedGame->board->nb_players);
+        send(hostedGame->clientData.clientSocket, boardBuffer, sizeof (struct player) * hostedGame->board->nb_players, 0);
+
+        hostedGame->updateAsked = 0;
+    }
+}
 
 DWORD WINAPI threadClient(LPVOID phosted_game) {
 
@@ -116,10 +122,16 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
     SOCKET clientSock = startClient("localhost", hostedGame->serverPort);
     HANDLE listenerThread = CreateThread(
             NULL, 0,
-            threadClientToServerListener, (LPVOID) &(struct clientListener) {
+            threadClientToServerListener,
+            (LPVOID) &(struct clientListener) {
                     .sock = clientSock,
                     .outbuf = outBuf
             }, 0, NULL
+    );
+    HANDLE emitterThread = CreateThread(
+            NULL, 0,
+            threadClientToServerEmitter,
+            (LPVOID)hostedGame, 0, NULL
     );
 
     hostedGame->clientData.serverMessages = outBuf;
@@ -140,6 +152,15 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
         if (_kbhit()) {
             int ch = _getch();
 
+            switch(ch) {
+                case 'i':
+                case 'j':
+                case 'k':
+                case 'l':
+                    onDeplacementDemande(hostedGame, ch);
+                default: break;
+            }
+
             if (ch == 'q') {
                 break;
             }
@@ -159,6 +180,7 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
 
     closeClient(hostedGame->clientData.clientSocket);
     CloseHandle(listenerThread);
+    CloseHandle(emitterThread);
 
     _putts(_T(""));
     SetEvent(consoleWriteEvent);

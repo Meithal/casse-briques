@@ -103,7 +103,8 @@ int main()
             } else {
                 CreateThread(
                         NULL, 0,
-                        threadClient, hostedGameFromIdx(hostedGamesIdx, hostedGames, input),
+                        threadClient,
+                        hostedGameFromIdx(hostedGamesIdx, hostedGames, input),
                         0, NULL
                 );
                 ResetEvent(consoleWriteEvent);
@@ -185,6 +186,7 @@ DWORD WINAPI threadServeur(LPVOID phosted_game)
     hostedGame->serverPort = 41480;
     hostedGame->mapNumber = map;
     hostedGame->hostData.clientPlayers = malloc(sizeof (struct clientPlayer) * board->nb_players);
+    hostedGame->clientData.selfIndex = GAME_CLIENT_INDEX_UNASSIGNED;
 
     SOCKET s;
     startServer(
@@ -222,6 +224,10 @@ void onConnectCallback(SOCKET sock)
 //    } while (nReadBytes != 0);
 }
 
+static void onMessageFromClient(void *hostedGame, char* message) {
+
+}
+
 DWORD WINAPI threadServerListenClient(LPVOID payload) {
     int nRetval = 0;
     struct threadServerArguments * sd = payload;
@@ -242,7 +248,8 @@ DWORD WINAPI threadServerListenClient(LPVOID payload) {
     send(cs, buf, strlen(buf), 0);
     onConnectCallback(cs);
 
-    if (!connectionClient(cs)) {
+    // on entre dans une boucle infinie où on écoute notre client
+    if (!connectionClient(cs, onMessageFromClient, hostedGame)) {
         _tprintf(_T("Erreur avec le client %"W"s\n"), friendlyErrorMessage(WSAGetLastError()));
         nRetval = 3;
     }

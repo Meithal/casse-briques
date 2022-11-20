@@ -319,7 +319,7 @@ _Bool shutdownConnection(SOCKET sd)
     return 1;
 }
 
-_Bool connectionClient(const SOCKET sd) {
+_Bool connectionClient(const SOCKET sd, void(*callback)(void* extra, char* message), void* extra) {
     // Read data from client
     char acReadBuffer[K_BUFFER_SIZE];
     int nReadBytes;
@@ -327,25 +327,7 @@ _Bool connectionClient(const SOCKET sd) {
         nReadBytes = recv(sd, acReadBuffer, K_BUFFER_SIZE, 0);
         if (nReadBytes > 0) {
             _tprintf(_T("Received %d bytes from client.\n"), nReadBytes);
-
-            int nSentBytes = 0;
-            while (nSentBytes < nReadBytes) {
-                int nTemp = send(sd, acReadBuffer + nSentBytes,
-                                 nReadBytes - nSentBytes, 0);
-                if (nTemp > 0) {
-                    _tprintf(_T("Sent %d bytes back to client.\n"), nTemp);
-                    nSentBytes += nTemp;
-                }
-                else if (nTemp == SOCKET_ERROR) {
-                    return 0;
-                }
-                else {
-                    // Client closed connection before we could reply to
-                    // all the data it sent, so bomb out early.
-                    _putts(_T("Peer unexpectedly dropped connection!"));
-                    return 1;
-                }
-            }
+            callback(extra, acReadBuffer);
         }
         else if (nReadBytes == SOCKET_ERROR) {
             if(WSAGetLastError() == WSAEWOULDBLOCK) {

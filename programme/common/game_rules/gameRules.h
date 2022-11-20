@@ -9,6 +9,14 @@
 
 #include "common/structures.h"
 
+#define GAME_CLIENT_INDEX_UNASSIGNED (-1)
+
+
+struct vec2dir {
+    int x;
+    int y;
+};
+
 int loadMap(char* path, board * board);
 void unloadMap(board * board);
 int setAIPlayers(int number, board * board);

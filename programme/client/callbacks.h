@@ -8,5 +8,6 @@
 #include "common/structures.h"
 
 void onGameSlotAssigned(hosted_game* hostedGame, int slot);
+void onDeplacementDemande(hosted_game* hostedGame, int direction);
 
 #endif //CASSES_BRIQUES_CALLBACKS_H

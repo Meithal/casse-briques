@@ -26,7 +26,7 @@ int stopWinsock();
 void startServer(SOCKET *s, LPTHREAD_START_ROUTINE threadServerListenClient, int *serverPort, void *arguments);
 void closeServer(const SOCKET *s);
 _Bool shutdownConnection(SOCKET sd);
-_Bool connectionClient(SOCKET sd);
+_Bool connectionClient(SOCKET sd, void(*callback)(void* extra, char* message), void* extra);
 _TCHAR * friendlyErrorMessage(DWORD errorCode);
 SOCKET startClient(char* address, int port);
 void closeClient(SOCKET s);

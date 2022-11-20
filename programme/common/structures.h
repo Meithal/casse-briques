@@ -57,9 +57,11 @@ struct hosted_game {
     } hostData;
     struct {
         SOCKET clientSocket;
+        int selfIndex;
         char * serverMessages;
         int serverMessagesCursor;
     } clientData;
+    _Bool updateAsked;
 };
 
 extern field vide;
