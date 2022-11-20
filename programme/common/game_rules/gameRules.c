@@ -192,6 +192,10 @@ _Bool canMoveAt(board*board, player*player, struct vec2dir to)
         return 0;
     }
 
+    if(NULL != bombAt(board, player->line + to.y, player->col + to.x)) {
+        return 0;
+    }
+
     return 1;
 }
 
