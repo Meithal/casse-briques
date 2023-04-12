@@ -13,7 +13,7 @@ static char *afficheJoueurs(int currentTile, struct player *player) {
     return "p";
 }
 
-static void updateGameFromServerMessages(hosted_game* hostedGame);
+static void updateGameFromServerMessages(struct hosted_game* hostedGame);
 
 void openNewConsole()
 {
@@ -109,7 +109,7 @@ DWORD WINAPI threadClientToServerEmitter(LPVOID pHostedGame)
 
 DWORD WINAPI threadClient(LPVOID phosted_game) {
 
-    hosted_game *hostedGame = phosted_game;
+    struct hosted_game *hostedGame = phosted_game;
     _putts(_T("Bienvenue dans la partie en cours"));
     _putts(_T("Appuyez sur les flèches pour vous déplacer, q pour quitter."));
 
@@ -176,7 +176,7 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
         updateGameFromServerMessages(hostedGame);
 
         int selfIdx = hostedGame->clientData.selfIndex;
-        player *self = &(*hostedGame->board->players)[selfIdx];
+        struct player *self = &(*hostedGame->board->players)[selfIdx];
         if(self->is_dead) {
             _putts(_T("Vous êtes mort !"));
             break;
@@ -202,7 +202,7 @@ DWORD WINAPI threadClient(LPVOID phosted_game) {
     return 0;
 }
 
-static void updateGameFromServerMessages(hosted_game* hostedGame)
+static void updateGameFromServerMessages(struct hosted_game* hostedGame)
 {
     char * buffer = hostedGame->clientData.serverMessages
             + hostedGame->clientData.serverMessagesCursor;

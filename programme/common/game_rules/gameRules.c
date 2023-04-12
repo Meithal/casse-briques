@@ -13,31 +13,31 @@
 //extern int charmap[0xff];
 
 
-field vide = {
+struct field vide = {
         .visual = 32,
         .txt = ' ',
         .destructible = 0,
 };
 
-field bricks = {
+struct field bricks = {
         .visual = 176,
         .txt = 'm',
         .destructible = 1,
 };
 
-field mur = {
+struct field mur = {
         .visual = 219,
         .txt = 'x',
         .destructible = 0,
 };
 
 
-static tile getTileAt(board*board, int y, int x)
+static struct tile getTileAt(struct board*board, int y, int x)
 {
     return (*board->board)[board->cols * y + x];
 }
 
-int loadMap(char* path, board * board)
+int loadMap(char* path, struct board * board)
 {
     FILE* f = fopen(path, "r");
 
@@ -63,7 +63,7 @@ int loadMap(char* path, board * board)
     #ifdef _MSC_VER
     board->board = malloc(sizeof (tile)* lignes*cols);
     #else
-    board->board = malloc(sizeof (tile[lignes][cols]));
+    board->board = malloc(sizeof (struct tile[lignes][cols]));
     #endif
     if (board->board == NULL) {
         return 1;
@@ -123,13 +123,13 @@ int loadMap(char* path, board * board)
     return 0;
 }
 
-void unloadMap(board *board) {
+void unloadMap(struct board *board) {
     free(board->players);
     free(board->board);
     free(board->bombes);
 }
 
-int setAIPlayers(int number, board * board)
+int setAIPlayers(int number, struct board * board)
 {
     if(number > board->nb_players) {
         return 0;
@@ -141,16 +141,16 @@ int setAIPlayers(int number, board * board)
     return 1;
 }
 
-int getPlacesRestantes(hosted_game * hostedGame)
+int getPlacesRestantes(struct hosted_game * hostedGame)
 {
     int restant = 0;
-    board * board = hostedGame->board;
+    struct board * board = hostedGame->board;
     int max = board->nb_players;
 
     restant = max;
 
     for(int i = 0; i < max ; i++) {
-        player player = (*board->players)[i];
+        struct player player = (*board->players)[i];
         if(player.is_ia) {
             restant--;
         }
@@ -161,7 +161,9 @@ int getPlacesRestantes(hosted_game * hostedGame)
     return restant;
 }
 
-hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[], int idx)
+struct hosted_game *hostedGameFromIdx(
+        int hostedGamesMax,
+        struct hosted_game games[], int idx)
 {
     int found = 1;
     for(int i = 0; i < hostedGamesMax ; i++, found++) {
@@ -176,11 +178,11 @@ hosted_game *hostedGameFromIdx(int hostedGamesMax, hosted_game games[], int idx)
     return NULL;
 }
 
-player * playerAtPosition(board*board, int y, int x)
+struct player * playerAtPosition(struct board*board, int y, int x)
 {
     for(int i = 0 ; i < board->nb_players ; i++)
     {
-        player player = (*board->players)[i];
+        struct player player = (*board->players)[i];
         if(player.col == x && player.line == y) {
             return &(*board->players)[i];
         }
@@ -188,9 +190,12 @@ player * playerAtPosition(board*board, int y, int x)
     return NULL;
 }
 
-_Bool canMoveAt(board*board, player*player, struct vec2dir to)
+_Bool canMoveAt(struct board*board,
+        struct player*player, struct vec2dir to)
 {
-    tile tile = getTileAt(board, player->line + to.y, player->col + to.x);
+    struct tile tile = getTileAt(
+            board,
+            player->line + to.y, player->col + to.x);
     if(tile.type->txt == 'm' || tile.type->txt == 'x') {
         return 0;
     }
@@ -202,10 +207,10 @@ _Bool canMoveAt(board*board, player*player, struct vec2dir to)
     return 1;
 }
 
-bombe * bombAt(board*board, int y, int x)
+struct bombe * bombAt(struct board*board, int y, int x)
 {
     for(int i = 0; i < board->nb_players * 5; i++) {
-        bombe *bombe = &(*board->bombes)[i];
+        struct bombe *bombe = &(*board->bombes)[i];
         // si une bombe existe deja a l'emplacement du joueur
         if(bombe->line == y && bombe->col == x) {
             return bombe;
@@ -215,10 +220,10 @@ bombe * bombAt(board*board, int y, int x)
     return NULL;
 }
 
-_Bool canLayBombAt(board*board, player*player)
+_Bool canLayBombAt(struct board*board, struct player*player)
 {
     for(int i = 0; i < board->nb_players * 5; i++) {
-        bombe bombe = (*board->bombes)[i];
+        struct bombe bombe = (*board->bombes)[i];
         // si une bombe existe deja a l'emplacement du joueur
         if(bombe.line == player->line && bombe.col == player->col) {
             return 0;
@@ -232,12 +237,12 @@ _Bool canLayBombAt(board*board, player*player)
     return 1;
 }
 
-void layBomb(board*board, player*player)
+void layBomb(struct board*board, struct player*player)
 {
     player->bombes_au_sol ++;
 
     for(int i = 0; i < board->nb_players * 5; i++) {
-        bombe *bombe = &(*board->bombes)[i];
+        struct bombe *bombe = &(*board->bombes)[i];
         // si une bombe existe deja a l'emplacement du joueur
         if(bombe->line == -1 && bombe->col == -1) {
             bombe->owner = player;
@@ -251,19 +256,19 @@ void layBomb(board*board, player*player)
     }
 }
 
-static void makeBombExplode(board*board, bombe* bombe) {
+static void makeBombExplode(struct board*board, struct bombe* bombe) {
     bombe->owner->bombes_au_sol--;
     bombe->explosed_at_ms = GetTickCount64();
 }
 
-_Bool shouldExplodeBomb(bombe*bomb)
+_Bool shouldExplodeBomb(struct bombe*bomb)
 {
     ULONGLONG now = GetTickCount64();
 
     return bomb->laid_at_ms + bomb->fuse_time_ms < now;
 }
 
-void updateGameState(board*board)
+void updateGameState(struct board*board)
 {
     _Bool map[board->rows][board->cols];
     for (int j = 0; j < board->rows; j++) {
@@ -279,7 +284,7 @@ void updateGameState(board*board)
 
     repeat:
     for(int i = 0; i < board->nb_players * 5; i++) {
-        bombe *bombe = &(*board->bombes)[i];
+        struct bombe *bombe = &(*board->bombes)[i];
         if(bombe->laid_at_ms == 0) {
             continue;
         }
@@ -295,7 +300,7 @@ void updateGameState(board*board)
         }
     }
     for(int i = 0; i < board->nb_players; i++) {
-        player *player = &(*board->players)[i];
+        struct player *player = &(*board->players)[i];
 
         if(isInDeflagration(board, board->rows, board->cols, &map, player->line, player->col)) {
             player->is_dead = 1;
@@ -303,22 +308,29 @@ void updateGameState(board*board)
     }
 }
 
-_Bool isInDeflagration(board*board, int rows, int cols, _Bool (*map)[rows][cols], int y, int x) {
+_Bool isInDeflagration(
+        struct board*board,
+        int rows, int cols,
+        _Bool (*map)[rows][cols], int y, int x) {
 
     return (*map)[y][x];
 }
 
-void computeDeflagration(int rows, int cols, _Bool (*map)[rows][cols], board*board)
+void computeDeflagration(
+        int rows,
+        int cols,
+        _Bool (*map)[rows][cols],
+        struct board*board)
 {
     for(int i = 0; i < board->nb_players * 5; i++) {
-        bombe *bombe = &(*board->bombes)[i];
+        struct bombe *bombe = &(*board->bombes)[i];
         if(bombe->col == -1) continue;
         if(bombe->explosed_at_ms == 0) continue;
         for(int dy = -1; dy <= 1 ; dy += 2) {
             for(int portee = 0; portee <= bombe->portee ; portee ++) {
                 int row_at = bombe->line + portee * dy;
                 if(row_at < 0 || row_at >= board->rows) break;
-                tile target = getTileAt(board, bombe->line + portee * dy, bombe->col);
+                struct tile target = getTileAt(board, bombe->line + portee * dy, bombe->col);
                 if(target.type->txt == 'x') break;
                 if(target.type->txt == 'm'){
                     (*map)[bombe->line + portee * dy][bombe->col] = 1;
@@ -331,7 +343,7 @@ void computeDeflagration(int rows, int cols, _Bool (*map)[rows][cols], board*boa
             for(int portee = 0; portee <= bombe->portee ; portee ++) {
                 int col_at = bombe->col + portee * dx;
                 if(col_at < 0 || col_at >= board->cols) break;
-                tile target = getTileAt(board, bombe->line, bombe->col + portee * dx);
+                struct tile target = getTileAt(board, bombe->line, bombe->col + portee * dx);
                 if(target.type->txt == 'x') break;
                 if(target.type->txt == 'm'){
                     (*map)[bombe->line][bombe->col + portee * dx] = 1;

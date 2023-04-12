@@ -7,20 +7,17 @@
 
 #include "winsock2.h"
 
-typedef struct field field;
 struct field {
     wchar_t visual;
     char txt;
     int destructible;
 };
 
-typedef struct tile tile;
 struct tile {
     struct field * type;
     int destroyed;
 };
 
-typedef struct player player;
 struct player {
     int line;
     int col;
@@ -33,7 +30,6 @@ struct player {
     int is_dead;
 };
 
-typedef struct bombe bombe;
 struct bombe {
     int line;
     int col;
@@ -41,10 +37,9 @@ struct bombe {
     unsigned long long laid_at_ms;
     unsigned long long fuse_time_ms;
     unsigned long long explosed_at_ms;
-    player * owner;
+    struct player * owner;
 };
 
-typedef struct board board;
 struct board {
     int rows;
     int cols;
@@ -55,22 +50,20 @@ struct board {
     struct bombe (* bombes)[];
 };
 
-typedef struct clientPlayer clientPlayer;
 struct clientPlayer {
     struct player * player;
     SOCKET connection;
     struct sockaddr_in socketAddress;
 };
 
-typedef struct hosted_game hosted_game;
 struct hosted_game {
-    board *board;
+    struct board *board;
     int mapNumber;
     int serverPort;
     struct {
         SOCKET serverSocket;
         int nbClients;
-        clientPlayer (*clientPlayers)[];
+        struct clientPlayer (*clientPlayers)[];
     } hostData;
     struct {
         SOCKET clientSocket;
@@ -81,9 +74,9 @@ struct hosted_game {
     _Bool updateAsked;
 };
 
-extern field vide;
-extern field bricks;
-extern field mur;
+extern struct field vide;
+extern struct field bricks;
+extern struct field mur;
 
 
 

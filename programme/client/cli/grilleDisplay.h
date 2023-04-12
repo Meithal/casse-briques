@@ -13,7 +13,7 @@
 void mapView(
     int size,
     _TCHAR *buffer,
-    board *board,
+    struct board *board,
     char *(*displayCallback)(int currentTile, struct player *player)
 );
 #endif //CASSES_BRIQUES_GRILLEDISPLAY_H

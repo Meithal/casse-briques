@@ -7,8 +7,8 @@
 
 #include "common/structures.h"
 
-void onGameSlotAssigned(hosted_game* hostedGame, int slot);
-void onDeplacementDemande(hosted_game* hostedGame, int direction);
-void onBombePoseDemande(hosted_game* hostedGame);
+void onGameSlotAssigned(struct hosted_game* hostedGame, int slot);
+void onDeplacementDemande(struct hosted_game* hostedGame, int direction);
+void onBombePoseDemande(struct hosted_game* hostedGame);
 
 #endif //CASSES_BRIQUES_CALLBACKS_H

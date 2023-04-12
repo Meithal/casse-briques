@@ -29,7 +29,7 @@ void onConnectCallback(SOCKET sock);
 
 void intHandler(int val);
 static int showAvailableMaps(char * folder);
-static int addSocketToGame(hosted_game * hostedGame, const SOCKET * socket);
+static int addSocketToGame(struct hosted_game * hostedGame, const SOCKET * socket);
 
 HANDLE consoleWriteMutex;
 
@@ -39,9 +39,9 @@ int main()
     HANDLE serverThreads[20];
 
     int hostedGamesIdx = 0;
-    hosted_game hostedGames[20];
+    struct hosted_game hostedGames[20];
     int boardsIdx = 0;
-    board boards[20];
+    struct board boards[20];
 
     /* On devrait faire closesocket(sock); puis WSACleanup(); mais puisqu'on a entré une boucle infinie ... */
 
@@ -65,96 +65,96 @@ int main()
     startWinsock();
 
     do {
-    _putts(_T("1. Voir les parties en cours."));
-    _putts(_T("2. Host une nouvelle partie."));
-    _putts(_T("3. Arrêter le serveur."));
+        _putts(_T("1. Voir les parties en cours."));
+        _putts(_T("2. Host une nouvelle partie."));
+        _putts(_T("3. Arrêter le serveur."));
 
-    int input = askIntInput(NULL, 1, 3);
+        int input = askIntInput(NULL, 1, 3);
 
-    switch (input) {
-        case 1: {
-            _putts(_T("Parties en cours :"));
-            for (int i = 0; i < hostedGamesIdx; ++i) {
-                _TCHAR bufOut[0x200] = {0};
-                mapView(0x200, bufOut, hostedGames[i].board, NULL);
+        switch (input) {
+            case 1: {
+                _putts(_T("Parties en cours :"));
+                for (int i = 0; i < hostedGamesIdx; ++i) {
+                    _TCHAR bufOut[0x200] = {0};
+                    mapView(0x200, bufOut, hostedGames[i].board, NULL);
 
-                _tprintf(_T("%d. \033[33mPlaces restantes : %d\033[0m\n%"W"s"),
-                    i+1,
-                    getPlacesRestantes(&hostedGames[i]),
-                    bufOut
-                );
-            }
-
-            _putts(_T("Quelle partie rejoindre ?"));
-
-            int found = 0;
-            for (int i = 0; i < hostedGamesIdx; ++i) {
-                if(!getPlacesRestantes(&hostedGames[i])) {
-                    continue;
+                    _tprintf(_T("%d. \033[33mPlaces restantes : %d\033[0m\n%"W"s"),
+                        i+1,
+                        getPlacesRestantes(&hostedGames[i]),
+                        bufOut
+                    );
                 }
-                _tprintf(_T("%d. Joindre la partie %d\n"), found+1, i+1);
-                found++;
-            }
-            _tprintf(_T("%d. Revenir à l'accueil\n"), found+1);
 
-            input = askIntInput(NULL, 1, found+1);
-            if(input == found+1) {
+                _putts(_T("Quelle partie rejoindre ?"));
+
+                int found = 0;
+                for (int i = 0; i < hostedGamesIdx; ++i) {
+                    if(!getPlacesRestantes(&hostedGames[i])) {
+                        continue;
+                    }
+                    _tprintf(_T("%d. Joindre la partie %d\n"), found+1, i+1);
+                    found++;
+                }
+                _tprintf(_T("%d. Revenir à l'accueil\n"), found+1);
+
+                input = askIntInput(NULL, 1, found+1);
+                if(input == found+1) {
+                    break;
+                } else {
+                    CreateThread(
+                            NULL, 0,
+                            threadClient,
+                            hostedGameFromIdx(hostedGamesIdx, hostedGames, input),
+                            0, NULL
+                    );
+                    ResetEvent(consoleWriteEvent);
+                    WaitForSingleObject(consoleWriteEvent, INFINITE);
+                }
                 break;
-            } else {
-                CreateThread(
+            }
+            case 2:
+            default: {
+                DWORD nThreadId;
+
+                boards[boardsIdx++] = (struct board) {0};
+                hostedGames[hostedGamesIdx++] = (struct hosted_game) {.board = &boards[boardsIdx-1]};
+
+                HANDLE thr = CreateThread(
                         NULL, 0,
-                        threadClient,
-                        hostedGameFromIdx(hostedGamesIdx, hostedGames, input),
-                        0, NULL
-                );
+                        threadServeur, &hostedGames[hostedGamesIdx-1], 0, &nThreadId);
+                if (thr == NULL) {
+                    _tprintf(_T("failed to create server thread: %d"), GetLastError());
+                }
+                serverThreads[serverThreadIdx++] = thr;
+                _tprintf(_T("Thread serveur crée: thid %d\n"), nThreadId);
+                fflush(stdout);
+
                 ResetEvent(consoleWriteEvent);
-                WaitForSingleObject(consoleWriteEvent, INFINITE);
+                DWORD wait = WaitForSingleObject(consoleWriteEvent, INFINITE);
+                switch (wait) {
+                    case WAIT_ABANDONED: {
+                        _putts(_T("Owning thread terminated"));
+                        break;
+                    }
+                    case WAIT_OBJECT_0: {
+                        _putts(_T("Thread signaled"));
+                        break;
+                    }
+                    case WAIT_TIMEOUT: {
+                        _putts(_T("Timeout elapsed"));
+                        break;
+                    }
+                    default:
+                    case WAIT_FAILED: {
+                        _tprintf(_T("Thread failed %"W"s\n"), friendlyErrorMessage(GetLastError()));
+                    }
+                }
+                break;
             }
-            break;
+            case 3:
+                goto exit;
         }
-        case 2:
-        default: {
-            DWORD nThreadId;
-
-            boards[boardsIdx++] = (board) {0};
-            hostedGames[hostedGamesIdx++] = (hosted_game) {.board = &boards[boardsIdx-1]};
-
-            HANDLE thr = CreateThread(
-                    NULL, 0,
-                    threadServeur, &hostedGames[hostedGamesIdx-1], 0, &nThreadId);
-            if (thr == NULL) {
-                _tprintf(_T("failed to create server thread: %d"), GetLastError());
-            }
-            serverThreads[serverThreadIdx++] = thr;
-            _tprintf(_T("Thread serveur crée: thid %d\n"), nThreadId);
-            fflush(stdout);
-
-            ResetEvent(consoleWriteEvent);
-            DWORD wait = WaitForSingleObject(consoleWriteEvent, INFINITE);
-            switch (wait) {
-                case WAIT_ABANDONED: {
-                    _putts(_T("Owning thread terminated"));
-                    break;
-                }
-                case WAIT_OBJECT_0: {
-                    _putts(_T("Thread signaled"));
-                    break;
-                }
-                case WAIT_TIMEOUT: {
-                    _putts(_T("Timeout elapsed"));
-                    break;
-                }
-                default:
-                case WAIT_FAILED: {
-                    _tprintf(_T("Thread failed %"W"s\n"), friendlyErrorMessage(GetLastError()));
-                }
-            }
-            break;
-        }
-        case 3:
-            goto exit;
-    }
-} while (1);
+    } while (1);
     exit:
 
     shutdownAsked = 1;
@@ -172,7 +172,7 @@ int main()
 DWORD WINAPI threadServeur(LPVOID phosted_game)
 {
     int retVal = 0;
-    hosted_game * hostedGame = phosted_game;
+    struct hosted_game * hostedGame = phosted_game;
     struct board * board = hostedGame->board;
 
     int mapsNumber = showAvailableMaps("assets/maps");
@@ -233,7 +233,7 @@ DWORD WINAPI threadServerListenClient(LPVOID payload) {
     struct threadServerArguments * sd = payload;
     SOCKET cs = sd->toClientSocket;
     struct sockaddr_in sockaddrIn = sd->socketAddress;
-    hosted_game * hostedGame = sd->extras;
+    struct hosted_game * hostedGame = sd->extras;
 
 
     TCHAR outBuf[40] = {0};
@@ -283,7 +283,7 @@ static int showAvailableMaps(char * folder) {
 
         char buf[0x100];
         sprintf(buf, "%s/grille%d.txt", folder, ret +1);
-        board board;
+        struct board board;
 
         loadMap(buf, &board);
         _TCHAR bufOut[0x200] = {0};
@@ -302,7 +302,7 @@ static int showAvailableMaps(char * folder) {
     return ret;
 }
 
-static int addSocketToGame(hosted_game * hostedGame, const SOCKET * socket)
+static int addSocketToGame(struct hosted_game * hostedGame, const SOCKET * socket)
 {
     (*hostedGame->hostData.clientPlayers)[hostedGame->hostData.nbClients++] =
             (struct clientPlayer) {.connection = *socket, .player = &(*hostedGame->board->players)[

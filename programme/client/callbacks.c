@@ -8,14 +8,14 @@
 #include "callbacks.h"
 #include "common/game_rules/gameRules.h"
 
-void onGameSlotAssigned(hosted_game* hostedGame, int slot)
+void onGameSlotAssigned(struct hosted_game* hostedGame, int slot)
 {
     _tprintf(_T("onGameSlotAssigned %d\n"), slot);
 
     hostedGame->clientData.selfIndex = slot;
 }
 
-void onDeplacementDemande(hosted_game* hostedGame, int direction)
+void onDeplacementDemande(struct hosted_game* hostedGame, int direction)
 {
     // si on a toujours pas recu le hello du serveur
     // on ne sait pas qui on est, alors on quitte tôt
@@ -36,7 +36,7 @@ void onDeplacementDemande(hosted_game* hostedGame, int direction)
             dir.x = 1; break;
         default: break;
     }
-    player *self = &(*hostedGame->board->players)[selfIdx];
+    struct player *self = &(*hostedGame->board->players)[selfIdx];
 
     if(!canMoveAt(hostedGame->board, self, dir)) {
         return;
@@ -48,7 +48,7 @@ void onDeplacementDemande(hosted_game* hostedGame, int direction)
     hostedGame->updateAsked = 1;
 }
 
-void onBombePoseDemande(hosted_game* hostedGame)
+void onBombePoseDemande(struct hosted_game* hostedGame)
 {
     // si on a toujours pas recu le hello du serveur
     // on ne sait pas qui on est, alors on quitte tôt
@@ -56,7 +56,7 @@ void onBombePoseDemande(hosted_game* hostedGame)
         return;
     }
     int selfIdx = hostedGame->clientData.selfIndex;
-    player *self = &(*hostedGame->board->players)[selfIdx];
+    struct player *self = &(*hostedGame->board->players)[selfIdx];
 
     if(canLayBombAt(hostedGame->board, self)) {
         layBomb(hostedGame->board, self);

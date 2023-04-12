@@ -6,7 +6,7 @@
 
 void mapView(int size,
              _TCHAR *buffer,
-             board *board,
+             struct board *board,
              char *(*displayCallback)(int currentTile, struct player *player)
 ){
     int written = 0;
@@ -40,7 +40,7 @@ void mapView(int size,
         );
     }
     for (int i = 0; i < board->nb_players * 5 ; i++) {
-        bombe *bombe = &(*board->bombes)[i];
+        struct bombe *bombe = &(*board->bombes)[i];
         if(bombe->col == -1) continue;
 
         written += _sntprintf(
@@ -54,23 +54,23 @@ void mapView(int size,
                 bombe->explosed_at_ms
         );
     }
-    for (int j = 0; j < board->rows; j++) {
-        for (int i = 0; i < board->cols; ++i) {
-            if(isInDeflagration(board, board->rows, board->cols, &map, j, i)) {
-                written += _sntprintf(buffer + written, size - written - 1, _T("*"));
-            } else {
-                written += _sntprintf(buffer + written, size - written - 1, _T("."));
-            }
-        }
-        written += _sntprintf(buffer + written, size - written - 1, _T("\n"));
-    }
+//    for (int j = 0; j < board->rows; j++) {
+//        for (int i = 0; i < board->cols; ++i) {
+//            if(isInDeflagration(board, board->rows, board->cols, &map, j, i)) {
+//                written += _sntprintf(buffer + written, size - written - 1, _T("*"));
+//            } else {
+//                written += _sntprintf(buffer + written, size - written - 1, _T("."));
+//            }
+//        }
+//        written += _sntprintf(buffer + written, size - written - 1, _T("\n"));
+//    }
     written += _sntprintf(buffer + written, size - written - 1, _T("\n"));
 
     for (int j = 0; j < board->rows; j++) {
         for (int i = 0; i < board->cols; ++i) {
             int vis = (*board->board)[j * board->cols + i].type->visual;
             vis = wide ? charmap[vis] : vis;
-            player *playerAtPos = NULL;
+            struct player *playerAtPos = NULL;
             if(isInDeflagration(board, board->rows, board->cols, &map, j, i)) {
                 written += _sntprintf(buffer + written, size - written - 1, _T("*"));
             } else if(bombAt(board, j, i)) {
